@@ -51,10 +51,7 @@ def scrape_ingredients(link):
     data = urllib2.urlopen(url).read()
     soup = BeautifulSoup(data)
 
-    image_link = soup.findAll('a', {'class':'icon-photoPage'})[0].get('href')
-
-    #save photos
-
+    image_page_link = soup.findAll('a', {'class':'icon-photoPage'})[0].get('href')
 
     ingreds = []
     for s in soup.findAll('li', {'class': 'checkList__line'}):
@@ -62,15 +59,12 @@ def scrape_ingredients(link):
         if not ingred.startswith('Add') and not ingred.startswith('ADVERTISEMEN'):
             ingreds.append(ingred[:s.text.strip().find('\n')])
 
-    return ingreds, image_link
+    return ingreds, image_page_link
 
- def save_photos(link, recipe_num, num_photos = 25):
+ def scrape_photos(link, recipe_num, num_photos = 25):
      url = "http://allrecipes.com"+link
      data = urllib2.urlopen(url).read()
      soup = BeautifulSoup(data)
-
-     #get profile image
-     # urllib.urlretrieve(soup.find('img', {'class':'img-profile'}).get('src'), 'images/Recipe_Images/'+item+'prof'
 
      i=0
 
