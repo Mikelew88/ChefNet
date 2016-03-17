@@ -12,14 +12,14 @@ import gridfs
 import mimetypes
 
 
-def Pull_Recipe_Links(start_url='http://allrecipes.com/recipes/'):
+def Pull_Recipe_Links(start_url='http://allrecipes.com/recipes/', limit=99999):
 
     Page_Error = False
     current_url = start_url
     i = 1
     Recipe_Links = defaultdict(str)
 
-    while not Page_Error and i<10:
+    while not Page_Error and i<limit:
         print(i)
         try:
 
@@ -44,7 +44,7 @@ def Pull_Recipe_Links(start_url='http://allrecipes.com/recipes/'):
         except Exception:
             Page_Error = True
 
-    return Recipe_Links, Page_Error
+    return Recipe_Links
 
 def scrape_ingredients(link):
     url = "http://allrecipes.com"+link
@@ -64,7 +64,37 @@ def scrape_ingredients(link):
 
     return ingreds, image_link
 
-def store_data():
+ def save_photos(link, recipe_num, num_photos = 25):
+     url = "http://allrecipes.com"+link
+     data = urllib2.urlopen(url).read()
+     soup = BeautifulSoup(data)
+
+     #get profile image
+     # urllib.urlretrieve(soup.find('img', {'class':'img-profile'}).get('src'), 'images/Recipe_Images/'+item+'prof'
+
+     i=0
+
+     for img in soup.findAll('img'):
+         src = str(img.get('src'))
+         if src[-4:]=='.jpg' and i < num_photos:
+             # pdb.set_trace()
+             print i
+             i+=1
+            #  urllib.urlretrieve(src, 'images/Recipe_Images/'+item+str(i)+'.jpg')
+
+     pass
+
+def store_data(image_url, filename):
+    mime_type = mimetypes.guess_type(image_url)[0]
+
+    a = fs.put(image_url, contentType=mime_type, filename)
+
+def run_scrapper():
+    """define opener"""
+    class MyOpener(urllib.FancyURLopener):
+        version = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11'
+    myopener = MyOpener()
+
     #run mongod first!
 
     db_client = MongoClient()
@@ -72,47 +102,10 @@ def store_data():
 
     fs = gridfs.GridFS(db)
 
-    image_url = 'http://images.media-allrecipes.com/userphotos/600x600/3371109.jpg'
+    Recipe_Links = Pull_Recipe_Links(limit = 10)
 
-    mime_type = mimetypes.guess_type(image_url)[0]
+    for key, val in Recipe_Links.iteritems():
+        scrape_ingredients(val[0])
 
-    a = fs.put(image_url, contentType=mime_type, filename='test.jpg')
 
 if __name__ == '__main__':
-    """define opener"""
-    class MyOpener(urllib.FancyURLopener):
-        version = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11'
-    myopener = MyOpener()
-
-    #Scrapes all recipe links
-
-    # time = datetime.datetime.utcnow()
-
-    # url = '/recipe/10402/the-best-rolled-sugar-cookies/photos/3326435/'
-
-    # save_photos(url,'the-best-rolled-sugar-cookies')
-
-
-
-    db_client = MongoClient()
-    db = db_client['allrecipes']
-
-    fs = gridfs.GridFS(db)
-
-    image_url = 'http://images.media-allrecipes.com/userphotos/600x600/3371109.jpg'
-
-    mime_type = mimetypes.guess_type(image_url)[0]
-
-    a = fs.put(image_url, contentType=mime_type, filename='test.jpg')
-    # Recipe_Links, Page_Error = Pull_Recipe_Links()
-    # ingreds, image_link=scrape_ingredients('/recipe/10402/the-best-rolled-sugar-cookies/')
-
-    # http://allrecipes.com/recipe/6698/moms-zucchini-bread/
-    # imgUrl = 'http://images.media-allrecipes.com/userphotos/250x250/3326435.jpg'
-    # urllib.urlretrieve(imgUrl, os.path.basename(imgUrl))
-
-    # MONGODB_HOST = 'localhost'
-    # MONGODB_PORT = 27017
-    #
-    # mongo_con = MongoClient(MONGODB_HOST, MONGODB_PORT)
-    # grid_fs = gridfs.GridFS(mongo_con.allrecipe_database)
