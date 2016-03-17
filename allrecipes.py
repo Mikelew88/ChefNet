@@ -64,25 +64,6 @@ def scrape_ingredients(link):
 
     return ingreds, image_link
 
-def save_photos(link, item):
-    url = "http://allrecipes.com"+link
-    data = urllib2.urlopen(url).read()
-    soup = BeautifulSoup(data)
-
-    #get profile image
-    # urllib.urlretrieve(soup.find('img', {'class':'img-profile'}).get('src'), 'images/Recipe_Images/'+item+'prof'
-
-    i=0
-
-    for img in soup.findAll('img'):
-        src = str(img.get('src'))
-        if src[-4:]=='.jpg' and i < 25:
-            # pdb.set_trace()
-            print i
-            i+=1
-            urllib.urlretrieve(src, 'images/Recipe_Images/'+item+str(i)+'.jpg')
-    pass
-
 def store_data():
     #run mongod first!
 
