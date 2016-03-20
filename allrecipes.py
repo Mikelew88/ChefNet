@@ -97,11 +97,7 @@ def scrape_photos(image_page_link, num_photos = 25):
     return image_links
 
 def store_data(recipe_dict):
-    mime_type = mimetypes.guess_type(image_url)[0]
 
-    a = fs.put(image_url, contentType=mime_type, filename=str('temp_imgname'+'.jpg'))
-
-def run_scrapper():
     #run mongod first!
 
     db_client = MongoClient()
@@ -109,8 +105,17 @@ def run_scrapper():
 
     fs = gridfs.GridFS(db)
 
-    recipe_dict = Pull_Recipe_Links(limit = 10)
-    return recipe_dict
+    #iterate thorough all items in dict
+    ingreds = db.ingreds
+
+    for key, val in recipe_dict.iteritems():
+        ingreds.insert({key:[val[0],val[2]]})
+
+        for i, image_url in enumerate(val[3]):
+            mime_type = mimetypes.guess_type(image_url)[0]
+
+            a = fs.put(image_url, contentType=mime_type, filename=str(key+'_'+str(i)+'.jpg'))
 
 if __name__ == '__main__':
-    recipe_dict = run_scrapper()
+    recipe_dict = Pull_Recipe_Links(limit = 9999)
+    store_data(recipe_dict)
