@@ -12,20 +12,17 @@ import mimetypes
 
 import pdb
 
-def Pull_Recipe_Links(start_url='http://allrecipes.com/recipes/', limit=99999):
+def Pull_Recipe_Links(limit=99999):
     """define opener"""
     class MyOpener(urllib.FancyURLopener):
         version = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11'
     myopener = MyOpener()
 
-    Page_Error = False
-    current_url = start_url
-    i = 1
+    current_url = 'http://allrecipes.com/recipes/'
+    i = 0
     recipe_dict = defaultdict(str)
 
-    while not Page_Error and i<limit:
-
-        # try:
+    while i<limit:
 
         page = myopener.open(current_url)
         soup = BeautifulSoup(page)
@@ -42,8 +39,6 @@ def Pull_Recipe_Links(start_url='http://allrecipes.com/recipes/', limit=99999):
 
             #Store recipe information in a default dictionary with the recipe number as the key (in case there are duplicate recipe names)
 
-            # pdb.set_trace()
-#
             print link
             if link[:8]=='/recipe/':
 
@@ -55,9 +50,6 @@ def Pull_Recipe_Links(start_url='http://allrecipes.com/recipes/', limit=99999):
 
         i += 1
         current_url = "http://allrecipes.com/recipes/?page=" + str(i)
-
-        # except Exception:
-        #     Page_Error = True
 
     return recipe_dict
 
