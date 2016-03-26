@@ -40,7 +40,13 @@ def scrape_item(link):
 
     if link[:8]=='/recipe/':
 
-        scrape_sub_page(recipe_id, link)
+        # scrape_sub_page(recipe_id, link)
+
+        # For threading
+        jobs=[]
+        t = threading.Thread(target=scrape_sub_page, args=(recipe_id,link))
+        jobs.append(t)
+        t.start()
 
     return recipe_dict
 
@@ -74,7 +80,7 @@ def scrape_sub_page(recipe_id, link):
 
     prep_time = dircetions.find('time', {'itemprop':'prepTime'}).get('datetime')
     cook_time = dircetions.find('time', {'itemprop':'cookTime'}).get('datetime')
-    total_time = = dircetions.find('time', {'itemprop':'totalTime'}).get('datetime')
+    total_time = dircetions.find('time', {'itemprop':'totalTime'}).get('datetime')
 
     dircetions = dircetions.findAll('span', {'class':'recipe-directions__list--item'})
     direction_list = [d.text for d in directions]
@@ -120,16 +126,11 @@ def run_parallel(num_pages = 10):
     pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
     outputs = pool.map(Pull_Recipe_Links, page_range)
 
-    # For threading
-    # jobs=[]
-    # for business in ids['businesses']:
-    #     business_path = BUSINESS_PATH + business['id']
-    #     t = threading.Thread(target=request_business, args=(business_path,))
-    #     jobs.append(t)
-    #     t.start()
     pass
 
 if __name__ == '__main__':
-    recipe_dict = Pull_Recipe_Links(limit = 9999)
+    # recipe_dict = Pull_Recipe_Links(limit = 9999)
 
-    store_data(recipe_dict)
+    # store_data(recipe_dict)
+
+    run_parallel()
