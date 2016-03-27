@@ -69,26 +69,25 @@ def scrape_recipe_page(recipe_id, link):
 
     #Initialize all vars to None
 
-    try:
-        stars = soup.find('div', {'class':'rating-stars'}).get('data-ratingstars')
-        submitter_name = soup.find('span', {'class':'submitter__name'}).text
-        submitter_desc = soup.find('div', {'class':'submitter__description'}).text
-        item_name = soup.find('h1', {'class':'recipe-summary__h1'}).text
+    stars = soup.find('div', {'class':'rating-stars'}).get('data-ratingstars')
+    submitter_name = soup.find('span', {'class':'submitter__name'}).text
+    submitter_desc = soup.find('div', {'class':'submitter__description'}).text
+    item_name = soup.find('h1', {'class':'recipe-summary__h1'}).text
 
-        ingred_list = []
+    ingred_list = []
 
-        for s in soup.findAll('li', {'class': 'checkList__line'}):
-            ingred = s.text.strip()
-            if not ingred.startswith('Add') and not ingred.startswith('ADVERTISEMEN'):
-                ingred_list.append(ingred[:s.text.strip().find('\n')])
+    for s in soup.findAll('li', {'class': 'checkList__line'}):
+        ingred = s.text.strip()
+        if not ingred.startswith('Add') and not ingred.startswith('ADVERTISEMEN'):
+            ingred_list.append(ingred[:s.text.strip().find('\n')])
 
-        dircetions = soup.find('div', {'class':'directions--section'})
+    dircetions = soup.find('div', {'class':'directions--section'})
 
-        prep_time = dircetions.find('time', {'itemprop':'prepTime'}).get('datetime')
-        cook_time = dircetions.find('time', {'itemprop':'cookTime'}).get('datetime')
-        total_time = dircetions.find('time', {'itemprop':'totalTime'}).get('datetime')
+    prep_time = dircetions.find('time', {'itemprop':'prepTime'}).get('datetime')
+    cook_time = dircetions.find('time', {'itemprop':'cookTime'}).get('datetime')
+    total_time = dircetions.find('time', {'itemprop':'totalTime'}).get('datetime')
 
-        directions = dircetions.findAll('span', {'class':'recipe-directions__list--item'})
+    directions = dircetions.findAll('span', {'class':'recipe-directions__list--item'})
         direction_list = [d.text for d in directions]
 
         #Need selenium to scrap related categories
@@ -101,8 +100,6 @@ def scrape_recipe_page(recipe_id, link):
         # cats = cat_soup.findAll('h3', {'class':'grid-col__h3'})
         # cat_text = [cat.text for cat in cats]
 
-    except Exception:
-        raise
     #Throw data into MongoDB
     recipe_db.insert_one({'id':recipe_id, 'item_name': item_name, 'ingred_list':ingred_list, 'direction_list':direction_list, 'stars': stars, 'submitter_name':submitter_name, 'submitter_desc': submitter_desc, 'prep_time':prep_time, 'cook_time':cook_time, 'total_time':total_time})
     # , 'cat_text':cat_text})
