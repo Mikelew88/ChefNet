@@ -20,13 +20,9 @@ def Pull_Recipe_Links(i):
         version = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11'
     myopener = MyOpener()
 
-    #Spin up mongo data, run mongod first!
+
     # fs = gridfs.GridFS(db)
     # db.remove({})
-    global db
-    db_client = MongoClient()
-    db = db_client['allrecipes']
-
 
     url = "http://allrecipes.com/recipes/?page=" + str(i)
 
@@ -85,6 +81,8 @@ def scrape_recipe_page(recipe_id, link):
     soup = BeautifulSoup(data, 'lxml')
 
     #Create cursor for each thread
+    db_client = MongoClient()
+    db = db_client['allrecipes']
     recipe_db = db.recipe_data
 
     # Scrape a bunch of data
@@ -113,6 +111,9 @@ def scrape_recipe_page(recipe_id, link):
 
     #Throw data into MongoDB
     recipe_db.insert_one({'id':recipe_id, 'item_name': item_name, 'ingred_list':ingred_list, 'direction_list':direction_list, 'stars': stars, 'submitter_name':submitter_name, 'submitter_desc': submitter_desc, 'prep_time':prep_time, 'cook_time':cook_time, 'total_time':total_time})
+
+    #close cursor or you will get compiler level memory errors
+    db_client.close()
 
     #Scrape Images
     image_page_link = soup.findAll('a', {'class':'icon-photoPage'})[0].get('href')
@@ -153,6 +154,8 @@ if __name__ == '__main__':
     # img_url = '/recipe/15925/creamy-au-gratin-potatoes/photos/738814/'
     # scrape_photos(15925, img_url, 4)
 
-    for i in xrange(1,999):
+    #Spin up mongo data, run mongod first!
+
+    for i in xrange(1,3):
 
         Pull_Recipe_Links(i)
