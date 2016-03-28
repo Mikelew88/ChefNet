@@ -29,9 +29,10 @@ def Pull_Recipe_Links(i):
 
     for a in Link_Soup:
         link = str(a.get('href')).strip()
-        scrape_item(link)
+        scrape_search(link)
 
-def scrape_item(link):
+
+def scrape_search(link):
     #Parse url string to locate recipe name and number
     end_recipe_number = link[8:].find('/')+8
     recipe_id = link[8:end_recipe_number]
@@ -51,7 +52,26 @@ def scrape_item(link):
 
     pass
 
+def null_time_helper(func):
+    '''
+    Input: function
+    Output: value of function or None
+    This will allow me to store pages that do not contain all scraped fields.
+    '''
+    try:
+        val = func.get('datetime')
+    except:
+        val = None
+    return val
+
 def scrape_recipe_page(recipe_id, link):
+    '''
+    INPUT: Unique Recipe ID, Link to individual Recipe Page
+    OUTPUT:
+    bool on whether extration was successful or not (Will also return False if the url already exists in the Mongo table, if the source is no longer availible on allrecipes, or the section is something we don't care about)
+    Dict to insert into Mongo Database or empty string if it isn't something we want to insert into Mongo
+    By checking the Mongo table during the extraction process we can save time by not getting the html of the url if that url already exists in the table.
+    '''
 
     #Spin up mongo data, run mongod first!
     # fs = gridfs.GridFS(db)
@@ -59,11 +79,12 @@ def scrape_recipe_page(recipe_id, link):
 
     db_client = MongoClient()
     db = db_client['allrecipes']
+    recipe_db = db.recipe_data
 
     url = "http://allrecipes.com"+link
     data = urllib2.urlopen(url).read()
     soup = BeautifulSoup(data, 'lxml')
-    recipe_db = db.recipe_data
+
 
     # Scrape a bunch of data
 
@@ -83,26 +104,16 @@ def scrape_recipe_page(recipe_id, link):
 
     dircetions = soup.find('div', {'class':'directions--section'})
 
-    prep_time = dircetions.find('time', {'itemprop':'prepTime'}).get('datetime')
-    cook_time = dircetions.find('time', {'itemprop':'cookTime'}).get('datetime')
-    total_time = dircetions.find('time', {'itemprop':'totalTime'}).get('datetime')
+    #If missing time data, set var to null
+    prep_time = null_time_helper(dircetions.find('time', {'itemprop':'prepTime'}))
+    cook_time = null_time_helper(dircetions.find('time', {'itemprop':'cookTime'}))
+    total_time = null_time_helper(dircetions.find('time', {'itemprop':'totalTime'}))
 
     directions = dircetions.findAll('span', {'class':'recipe-directions__list--item'})
-        direction_list = [d.text for d in directions]
-
-        #Need selenium to scrap related categories
-
-        # driver = webdriver.Firefox()
-        # driver.get(url)
-        # sel_soup = BeautifulSoup(driver.page_source, 'html.parser')
-        #
-        # cat_soup = sel_soup.find('div', {'class': ['tab-pane', 'ng-scope', 'ng-isolate-scope'],'title':'Categories'})
-        # cats = cat_soup.findAll('h3', {'class':'grid-col__h3'})
-        # cat_text = [cat.text for cat in cats]
+    direction_list = [d.text for d in directions]
 
     #Throw data into MongoDB
     recipe_db.insert_one({'id':recipe_id, 'item_name': item_name, 'ingred_list':ingred_list, 'direction_list':direction_list, 'stars': stars, 'submitter_name':submitter_name, 'submitter_desc': submitter_desc, 'prep_time':prep_time, 'cook_time':cook_time, 'total_time':total_time})
-    # , 'cat_text':cat_text})
 
     #Scrape Images
     image_page_link = soup.findAll('a', {'class':'icon-photoPage'})[0].get('href')
@@ -129,6 +140,11 @@ def scrape_photos(recipe_id, image_page_link, num_photos = 25):
     pass
 
 def run_parallel(num_pages = 10):
+    global db_client, db, recipe_db
+    db_client = MongoClient()
+    db = db_client['allrecipes']
+    recipe_db = db.recipe_data
+
     page_range = range(1,num_pages)
     pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
     outputs = pool.map(Pull_Recipe_Links, page_range)
@@ -139,9 +155,9 @@ if __name__ == '__main__':
     # recipe_dict = Pull_Recipe_Links(limit = 9999)
 
     # store_data(recipe_dict)
-    # run_parallel(3)
+    run_parallel(num_pages=3)
 
     #Testing
-    Pull_Recipe_Links(3)
+    # Pull_Recipe_Links(3)
     # img_url = '/recipe/15925/creamy-au-gratin-potatoes/photos/738814/'
     # scrape_photos(15925, img_url, 4)
