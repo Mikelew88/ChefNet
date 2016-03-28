@@ -25,6 +25,7 @@ class RequestInfoThread(Thread):
             self.image_url = self._get_img_url()
             img_data = urllib2.urlopen(self.image_url).read()
             self.img_soup =  BeautifulSoup(img_data, 'lxml')
+            self._scrape_photos()
 
     def _request_info(self):
         '''
@@ -67,7 +68,7 @@ class RequestInfoThread(Thread):
     def _scrape_photos(self, num_photos = 25):
         i=0
 
-        img_band = img_soup.find('ul', {'class':'photos--band'})
+        img_band = self.img_soup.find('ul', {'class':'photos--band'})
         for img in img_band.findAll('img'):
             src = str(img.get('src'))
             if src[-4:]=='.jpg' and i < num_photos:
