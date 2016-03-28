@@ -10,7 +10,8 @@ from pymongo import MongoClient
 # import gridfs
 # import mimetypes
 # import multiprocessing
-import threading
+from threading import Thread
+from RequestInfoThread import RequestInfoThread
 
 # import pdb
 
@@ -33,7 +34,8 @@ def Pull_Recipe_Links(i):
 
     for a in Link_Soup:
         link = str(a.get('href')).strip()
-        scrape_search(link)
+        mongo_update_lst = scrape_search(link)
+        store_data(mongo_update_lst)
 
 
 def scrape_search(link):
@@ -44,95 +46,35 @@ def scrape_search(link):
 
     #Store recipe information in a default dictionary with the recipe number as the key (in case there are duplicate recipe names)
 
+    # scrape_recipe_page(recipe_id, link)
+    # For threading
+    threads=[]
+    mongo_update_lst = []
+
     if link[:8]=='/recipe/':
 
-        # scrape_recipe_page(recipe_id, link)
-        # For threading
-        jobs=[]
-        t = threading.Thread(target=scrape_recipe_page, args=(recipe_id,link))
-        jobs.append(t)
+
+        t = RequestInfoThread(recipe_id,link)
         t.start()
+        threads.append(t)
 
-    pass
+        for thread in threads:
+            thread.join()
+            mongo_update_lst.append(thread.json_dct)
 
-def null_time_helper(func):
-    '''
-    Input: function
-    Output: value of function or None
-    This will allow me to store pages that do not contain all scraped fields.
-    '''
-    try:
-        val = func.get('datetime')
-    except:
-        val = None
-    return val
+    return mongo_update_lst
 
-def scrape_recipe_page(recipe_id, link):
-    '''
-    INPUT: Unique Recipe ID, Link to individual Recipe Page
-    OUTPUT:
-    bool on whether extration was successful or not (Will also return False if the url already exists in the Mongo table, if the source is no longer availible on allrecipes, or the section is something we don't care about)
-    Dict to insert into Mongo Database or empty string if it isn't something we want to insert into Mongo
-    By checking the Mongo table during the extraction process we can save time by not getting the html of the url if that url already exists in the table.
-    '''
-
-    url = "http://allrecipes.com"+link
-    data = urllib2.urlopen(url).read()
-    soup = BeautifulSoup(data, 'lxml')
-
-    #Create cursor for each thread
+def store_data(mongo_update_lst):
+    #Store results in mongo
     db_client = MongoClient()
-    db = db_client['allrecipes']
-    recipe_db = db.recipe_data
+    db = db_client['test']
+    recipe_db = db['recipe_data']
 
-    # Scrape a bunch of data
-
-    stars = soup.find('div', {'class':'rating-stars'}).get('data-ratingstars')
-    submitter_name = soup.find('span', {'class':'submitter__name'}).text
-    submitter_desc = soup.find('div', {'class':'submitter__description'}).text
-    item_name = soup.find('h1', {'class':'recipe-summary__h1'}).text
-
-    ingred_list = []
-
-    for s in soup.findAll('li', {'class': 'checkList__line'}):
-        ingred = s.text.strip()
-        if not ingred.startswith('Add') and not ingred.startswith('ADVERTISEMEN'):
-            ingred_list.append(ingred[:s.text.strip().find('\n')])
-
-    dircetions = soup.find('div', {'class':'directions--section'})
-
-    #If missing time data, set var to null
-    prep_time = null_time_helper(dircetions.find('time', {'itemprop':'prepTime'}))
-    cook_time = null_time_helper(dircetions.find('time', {'itemprop':'cookTime'}))
-    total_time = null_time_helper(dircetions.find('time', {'itemprop':'totalTime'}))
-
-    directions = dircetions.findAll('span', {'class':'recipe-directions__list--item'})
-    direction_list = [d.text for d in directions]
-
-    #Throw data into MongoDB
-    recipe_db.insert_one({'id':recipe_id, 'item_name': item_name, 'ingred_list':ingred_list, 'direction_list':direction_list, 'stars': stars, 'submitter_name':submitter_name, 'submitter_desc': submitter_desc, 'prep_time':prep_time, 'cook_time':cook_time, 'total_time':total_time})
-
-    #close cursor or you will get compiler level memory errors
+    for json_dct in mongo_update_lst:
+        for k, v in json_dct.iteritems():
+            if v:
+                recipe_db.update_one({'id': k}, {'$set':{k:v}})
     db_client.close()
-
-    #Scrape Images
-    image_page_link = soup.findAll('a', {'class':'icon-photoPage'})[0].get('href')
-    scrape_photos(recipe_id, image_page_link)
-    pass
-
-def scrape_photos(recipe_id, image_page_link, num_photos = 25):
-    url = "http://allrecipes.com"+image_page_link
-    data = urllib2.urlopen(url).read()
-    soup = BeautifulSoup(data, 'lxml')
-
-    i=0
-
-    img_band = soup.find('ul', {'class':'photos--band'})
-    for img in img_band.findAll('img'):
-        src = str(img.get('src'))
-        if src[-4:]=='.jpg' and i < num_photos:
-            urllib.urlretrieve(src, 'images/Recipe_Images/'+str(recipe_id)+'_'+str(i)+'.jpg')
-            i+=1
     pass
 
 def run_parallel(num_pages = 10):
@@ -157,5 +99,4 @@ if __name__ == '__main__':
     #Spin up mongo data, run mongod first!
 
     for i in xrange(1,3):
-
         Pull_Recipe_Links(i)
