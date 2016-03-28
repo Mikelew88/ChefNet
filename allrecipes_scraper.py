@@ -20,6 +20,14 @@ def Pull_Recipe_Links(i):
         version = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11'
     myopener = MyOpener()
 
+    #Spin up mongo data, run mongod first!
+    # fs = gridfs.GridFS(db)
+    # db.remove({})
+    global db
+    db_client = MongoClient()
+    db = db_client['allrecipes']
+
+
     url = "http://allrecipes.com/recipes/?page=" + str(i)
 
     page = myopener.open(url)
@@ -73,22 +81,14 @@ def scrape_recipe_page(recipe_id, link):
     By checking the Mongo table during the extraction process we can save time by not getting the html of the url if that url already exists in the table.
     '''
 
-    #Spin up mongo data, run mongod first!
-    # fs = gridfs.GridFS(db)
-    # db.remove({})
-
-    db_client = MongoClient()
-    db = db_client['allrecipes']
-    recipe_db = db.recipe_data
-
     url = "http://allrecipes.com"+link
     data = urllib2.urlopen(url).read()
     soup = BeautifulSoup(data, 'lxml')
 
+    #Create cursor for each thread
+    recipe_db = db.recipe_data
 
     # Scrape a bunch of data
-
-    #Initialize all vars to None
 
     stars = soup.find('div', {'class':'rating-stars'}).get('data-ratingstars')
     submitter_name = soup.find('span', {'class':'submitter__name'}).text
@@ -127,23 +127,15 @@ def scrape_photos(recipe_id, image_page_link, num_photos = 25):
 
     i=0
 
-    image_links = []
-
-    for img in soup.findAll('img'):
+    img_band = soup.find('ul', {'class':'photos--band'})
+    for img in img_band.findAll('img'):
         src = str(img.get('src'))
         if src[-4:]=='.jpg' and i < num_photos:
-            image_links.append(src)
-
-            # mime_type = mimetypes.guess_type(image_page_link)[0]
-
             urllib.urlretrieve(src, 'images/Recipe_Images/'+str(recipe_id)+'_'+str(i)+'.jpg')
+            i+=1
     pass
 
 def run_parallel(num_pages = 10):
-    global db_client, db, recipe_db
-    db_client = MongoClient()
-    db = db_client['allrecipes']
-    recipe_db = db.recipe_data
 
     page_range = range(1,num_pages)
     pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
@@ -155,9 +147,12 @@ if __name__ == '__main__':
     # recipe_dict = Pull_Recipe_Links(limit = 9999)
 
     # store_data(recipe_dict)
-    run_parallel(num_pages=3)
+    # run_parallel(num_pages=3)
 
     #Testing
     # Pull_Recipe_Links(3)
     # img_url = '/recipe/15925/creamy-au-gratin-potatoes/photos/738814/'
     # scrape_photos(15925, img_url, 4)
+
+    for i in xrange(1,9):
+        Pull_Recipe_Links(i)
