@@ -25,7 +25,7 @@ class RequestInfoThread(Thread):
             self.image_url = self._get_img_url()
             img_data = urllib2.urlopen(self.image_url).read()
             self.img_soup =  BeautifulSoup(img_data, 'lxml')
-            self._scrape_photos()
+            self._scrape_photos(num_photos=999)
 
     def _request_info(self):
         '''

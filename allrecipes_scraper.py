@@ -9,11 +9,9 @@ import urllib, urllib2
 from pymongo import MongoClient
 # import gridfs
 # import mimetypes
-# import multiprocessing
+import multiprocessing
 from threading import Thread
 from RequestInfoThread import RequestInfoThread
-
-# import pdb
 
 def Pull_Recipe_Links(i):
     """define opener"""
@@ -23,24 +21,24 @@ def Pull_Recipe_Links(i):
 
     #Store results in mongo
     db_client = MongoClient()
-    db = db_client['test']
+    db = db_client['allrecipes']
     recipe_db = db['recipe_data']
-
-    # fs = gridfs.GridFS(db)
-    # db.remove({})
+    # recipe_db.remove({})
 
     url = "http://allrecipes.com/recipes/?page=" + str(i)
 
     page = myopener.open(url)
     soup = BeautifulSoup(page, 'lxml')
 
-    Link_Soup = soup.findAll('a')
+    Link_Soup = set(soup.findAll('a'))
 
     for a in Link_Soup:
         link = str(a.get('href')).strip()
-        mongo_update_lst = scrape_search(link, recipe_db)
-        if mongo_update_lst:
-            store_data(mongo_update_lst, recipe_db)
+
+        if link[:8]=='/recipe/':
+            mongo_update_lst = scrape_search(link, recipe_db)
+            if mongo_update_lst:
+                store_data(mongo_update_lst, recipe_db)
 
     db_client.close()
 
@@ -58,15 +56,14 @@ def scrape_search(link, recipe_db):
     threads=[]
     mongo_update_lst = []
 
-    if link[:8]=='/recipe/':
+    t = RequestInfoThread(recipe_id,link)
 
-        t = RequestInfoThread(recipe_id,link)
-        t.start()
-        threads.append(t)
+    t.start()
+    threads.append(t)
 
-        for thread in threads:
-            thread.join()
-            mongo_update_lst.append(thread.json_dct)
+    for thread in threads:
+        thread.join()
+        mongo_update_lst.append(thread.json_dct)
 
     return mongo_update_lst
 
@@ -88,17 +85,10 @@ def run_parallel(num_pages = 10):
     pass
 
 if __name__ == '__main__':
-    # recipe_dict = Pull_Recipe_Links(limit = 9999)
-
     # store_data(recipe_dict)
-    # run_parallel(num_pages=3)
-
-    #Testing
-    # Pull_Recipe_Links(3)
-    # img_url = '/recipe/15925/creamy-au-gratin-potatoes/photos/738814/'
-    # scrape_photos(15925, img_url, 4)
+    run_parallel(num_pages=99)
 
     #Spin up mongo data, run mongod first!
 
-    for i in xrange(1,3):
-        Pull_Recipe_Links(i)
+    # for i in xrange(1,3):
+    #     Pull_Recipe_Links(i)
