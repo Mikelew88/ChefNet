@@ -3,16 +3,16 @@ import datetime
 
 from bs4 import BeautifulSoup
 import urllib, urllib2
-from selenium import webdriver
-import re
+# from selenium import webdriver
+# import re
 
 from pymongo import MongoClient
-import gridfs
-import mimetypes
-import multiprocessing
+# import gridfs
+# import mimetypes
+# import multiprocessing
 import threading
 
-import pdb
+# import pdb
 
 def Pull_Recipe_Links(i):
     """define opener"""
