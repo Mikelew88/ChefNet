@@ -21,9 +21,10 @@ class RequestInfoThread(Thread):
 
     def run(self):
         self.json_dct = self._request_info()
-        self.image_url = self._get_img_url()
-        img_data = urllib2.urlopen(self.image_url).read()
-        self.img_soup =  BeautifulSoup(img_data, 'lxml')
+        if self.json_dct:
+            self.image_url = self._get_img_url()
+            img_data = urllib2.urlopen(self.image_url).read()
+            self.img_soup =  BeautifulSoup(img_data, 'lxml')
 
     def _request_info(self):
         '''
@@ -57,7 +58,7 @@ class RequestInfoThread(Thread):
         #Throw data into MongoDB
         json_dct = ({'id':self.recipe_id, 'item_name': item_name, 'ingred_list':ingred_list, 'direction_list':direction_list, 'stars': stars, 'submitter_name':submitter_name, 'submitter_desc': submitter_desc, 'prep_time':prep_time, 'cook_time':cook_time, 'total_time':total_time})
 
-        return {self.recipe_id : json_dct}
+        return json_dct
 
     def _get_img_url(self):
         image_url = self.soup.findAll('a', {'class':'icon-photoPage'})[0].get('href')

@@ -21,6 +21,10 @@ def Pull_Recipe_Links(i):
         version = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11'
     myopener = MyOpener()
 
+    #Store results in mongo
+    db_client = MongoClient()
+    db = db_client['test']
+    recipe_db = db['recipe_data']
 
     # fs = gridfs.GridFS(db)
     # db.remove({})
@@ -34,25 +38,27 @@ def Pull_Recipe_Links(i):
 
     for a in Link_Soup:
         link = str(a.get('href')).strip()
-        mongo_update_lst = scrape_search(link)
-        store_data(mongo_update_lst)
+        mongo_update_lst = scrape_search(link, recipe_db)
+        if mongo_update_lst:
+            store_data(mongo_update_lst, recipe_db)
+
+    db_client.close()
 
 
-def scrape_search(link):
+def scrape_search(link, recipe_db):
     #Parse url string to locate recipe name and number
     end_recipe_number = link[8:].find('/')+8
     recipe_id = link[8:end_recipe_number]
     recipe_label = link[end_recipe_number+1:link[end_recipe_number+1:].find('/')+end_recipe_number+1]
 
-    #Store recipe information in a default dictionary with the recipe number as the key (in case there are duplicate recipe names)
+    if already_exists(recipe_db, recipe_id):
+        return False
 
-    # scrape_recipe_page(recipe_id, link)
-    # For threading
+    # Thread scrape_recipe_page(recipe_id, link)
     threads=[]
     mongo_update_lst = []
 
     if link[:8]=='/recipe/':
-
 
         t = RequestInfoThread(recipe_id,link)
         t.start()
@@ -64,18 +70,14 @@ def scrape_search(link):
 
     return mongo_update_lst
 
-def store_data(mongo_update_lst):
-    #Store results in mongo
-    db_client = MongoClient()
-    db = db_client['test']
-    recipe_db = db['recipe_data']
-
+def store_data(mongo_update_lst, recipe_db):
     for json_dct in mongo_update_lst:
-        for k, v in json_dct.iteritems():
-            if v:
-                recipe_db.update_one({'id': k}, {'$set':{k:v}})
-    db_client.close()
+        if json_dct:
+            recipe_db.insert_one(json_dct)
     pass
+
+def already_exists(recipe_db, id):
+    return bool(recipe_db.find({'id': id}).count())
 
 def run_parallel(num_pages = 10):
 
