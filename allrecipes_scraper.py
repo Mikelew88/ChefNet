@@ -51,7 +51,6 @@ def scrape_search(link):
     if link[:8]=='/recipe/':
 
         # scrape_recipe_page(recipe_id, link)
-
         # For threading
         jobs=[]
         t = threading.Thread(target=scrape_recipe_page, args=(recipe_id,link))
@@ -154,5 +153,6 @@ if __name__ == '__main__':
     # img_url = '/recipe/15925/creamy-au-gratin-potatoes/photos/738814/'
     # scrape_photos(15925, img_url, 4)
 
-    for i in xrange(1,9):
+    for i in xrange(1,999):
+
         Pull_Recipe_Links(i)
