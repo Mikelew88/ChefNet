@@ -1,5 +1,5 @@
 from threading import Thread
-import urllib2
+import urllib, urllib2
 from bs4 import BeautifulSoup
 
 
