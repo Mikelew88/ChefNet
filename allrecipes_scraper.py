@@ -86,9 +86,10 @@ def run_parallel(num_pages = 10):
 
 if __name__ == '__main__':
     # store_data(recipe_dict)
-    run_parallel(num_pages=99)
+    run_parallel(num_pages=999999)
 
     #Spin up mongo data, run mongod first!
 
     # for i in xrange(1,3):
-    #     Pull_Recipe_Links(i)
+    
+    # Pull_Recipe_Links(i)
