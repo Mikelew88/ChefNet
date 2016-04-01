@@ -1,6 +1,7 @@
 from keras.layers import Dense, Dropout, Activation
 from keras.layers.recurrent import GRU
 from keras.layers.core import TimeDistributedDense, Flatten
+from keras.models import Sequential
 
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
 
