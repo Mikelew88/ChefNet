@@ -30,7 +30,7 @@ image_model.add(Flatten())
 image_model.add(Dense(128))
 
 # let's load the weights from a save file.
-image_model.load_weights('Weights/vgg16_weights.h5')
+image_model.load_weights('../Weights/vgg16_weights.h5')
 
 # next, let's define a RNN model that encodes sequences of words
 # into sequences of 128-dimensional word vectors.
