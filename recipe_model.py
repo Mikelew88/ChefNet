@@ -1,36 +1,90 @@
+import numpy as np
+
 from keras.layers import Dense, Dropout, Activation
 from keras.layers.recurrent import GRU
-from keras.layers.core import TimeDistributedDense, Flatten
+from keras.layers.core import TimeDistributedDense, Flatten, Dense, Dropout
 from keras.models import Sequential
 
-from keras.layers.convolutional import Convolution2D, MaxPooling2D
+from keras.layers.convolutional import Convolution2D, MaxPooling2D, ZeroPadding2D
 
 from keras.optimizers import SGD
 
 max_caption_len = 16
 vocab_size = 10000
 
+
+def VGG_16(weights_path=None):
+    model = Sequential()
+    model.add(ZeroPadding2D((1,1),input_shape=(3,224,224)))
+    model.add(Convolution2D(64, 3, 3, activation='relu'))
+    model.add(ZeroPadding2D((1,1)))
+    model.add(Convolution2D(64, 3, 3, activation='relu'))
+    model.add(MaxPooling2D((2,2), strides=(2,2)))
+
+    model.add(ZeroPadding2D((1,1)))
+    model.add(Convolution2D(128, 3, 3, activation='relu'))
+    model.add(ZeroPadding2D((1,1)))
+    model.add(Convolution2D(128, 3, 3, activation='relu'))
+    model.add(MaxPooling2D((2,2), strides=(2,2)))
+
+    model.add(ZeroPadding2D((1,1)))
+    model.add(Convolution2D(256, 3, 3, activation='relu'))
+    model.add(ZeroPadding2D((1,1)))
+    model.add(Convolution2D(256, 3, 3, activation='relu'))
+    model.add(ZeroPadding2D((1,1)))
+    model.add(Convolution2D(256, 3, 3, activation='relu'))
+    model.add(MaxPooling2D((2,2), strides=(2,2)))
+
+    model.add(ZeroPadding2D((1,1)))
+    model.add(Convolution2D(512, 3, 3, activation='relu'))
+    model.add(ZeroPadding2D((1,1)))
+    model.add(Convolution2D(512, 3, 3, activation='relu'))
+    model.add(ZeroPadding2D((1,1)))
+    model.add(Convolution2D(512, 3, 3, activation='relu'))
+    model.add(MaxPooling2D((2,2), strides=(2,2)))
+
+    model.add(ZeroPadding2D((1,1)))
+    model.add(Convolution2D(512, 3, 3, activation='relu'))
+    model.add(ZeroPadding2D((1,1)))
+    model.add(Convolution2D(512, 3, 3, activation='relu'))
+    model.add(ZeroPadding2D((1,1)))
+    model.add(Convolution2D(512, 3, 3, activation='relu'))
+    model.add(MaxPooling2D((2,2), strides=(2,2)))
+
+    model.add(Flatten())
+    model.add(Dense(4096, activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(4096, activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(1000, activation='softmax'))
+
+    if weights_path:
+        model.load_weights(weights_path)
+
+    return model
+
+image_model = VGG_16(../Weights/vgg_16_weights.h5)
+
 # first, let's define an image model that
 # will encode pictures into 128-dimensional vectors.
 # it should be initialized with pre-trained weights.
-image_model = Sequential()
-image_model.add(Convolution2D(32, 3, 3, border_mode='valid', input_shape=(3, 100, 100)))
-image_model.add(Activation('relu'))
-image_model.add(Convolution2D(32, 3, 3))
-image_model.add(Activation('relu'))
-image_model.add(MaxPooling2D(pool_size=(2, 2)))
 
-image_model.add(Convolution2D(64, 3, 3, border_mode='valid'))
-image_model.add(Activation('relu'))
-image_model.add(Convolution2D(64, 3, 3))
-image_model.add(Activation('relu'))
-image_model.add(MaxPooling2D(pool_size=(2, 2)))
+# image_model = Sequential()
+# image_model.add(Convolution2D(32, 3, 3, border_mode='valid', input_shape=(3, 100, 100)))
+# image_model.add(Activation('relu'))
+# image_model.add(Convolution2D(32, 3, 3))
+# image_model.add(Activation('relu'))
+# image_model.add(MaxPooling2D(pool_size=(2, 2)))
+#
+# image_model.add(Convolution2D(64, 3, 3, border_mode='valid'))
+# image_model.add(Activation('relu'))
+# image_model.add(Convolution2D(64, 3, 3))
+# image_model.add(Activation('relu'))
+# image_model.add(MaxPooling2D(pool_size=(2, 2)))
+#
+# image_model.add(Flatten())
+# image_model.add(Dense(128))
 
-image_model.add(Flatten())
-image_model.add(Dense(128))
-
-# let's load the weights from a save file.
-image_model.load_weights('../Weights/vgg16_weights.h5')
 
 # next, let's define a RNN model that encodes sequences of words
 # into sequences of 128-dimensional word vectors.
