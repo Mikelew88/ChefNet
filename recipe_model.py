@@ -2,6 +2,7 @@ import numpy as np
 
 from keras.layers import Dense, Dropout, Activation
 from keras.layers.recurrent import GRU
+from keras.layers.embeddings import Embedding
 from keras.layers.core import TimeDistributedDense, Flatten, Dense, Dropout
 from keras.models import Sequential
 
