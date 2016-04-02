@@ -63,7 +63,7 @@ def VGG_16(weights_path=None):
 
     return model
 
-image_model = VGG_16('Weights/vgg_16_weights.h5')
+image_model = VGG_16('Weights/vgg16_weights.h5')
 
 # first, let's define an image model that
 # will encode pictures into 128-dimensional vectors.
