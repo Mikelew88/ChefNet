@@ -1,9 +1,11 @@
 from os import listdir
 import re
 import pandas as pd
+import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from keras.preprocessing.image import ImageDataGenerator
 from skimage.io import imread_collection, imshow_collection
+from scipy.misc import imread
 
 def clean_text(ingred_list):
     '''
@@ -45,7 +47,7 @@ def clean_text(ingred_list):
 
     return ingred_caption_underscored
 
-def expand_df_images(df_in, dir_path='images/Recipe_Images'):
+def expand_df_images(df_in, dir_path='images/Recipe_Images/'):
     datagen = ImageDataGenerator()
     img_dir = listdir(dir_path)
 
@@ -62,8 +64,8 @@ def expand_df_images(df_in, dir_path='images/Recipe_Images'):
     return df_out
 
 def vectorize_imgs(img_paths):
-
-    return imread_collection(img_paths, conserve_memory=True)
+    return [imread(img) for img in img_paths]
+    # return imread_collection(img_paths, conserve_memory=True)
 
 def vectorize_text(ingred_list):
     underscored_captions = clean_text(ingred_list)

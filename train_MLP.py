@@ -21,7 +21,7 @@ nb_classes = 10
 nb_epoch = 200
 data_augmentation = True
 
-def prepare_data(df, img_path = 'images/Recipe_Images'):
+def prepare_data(df, img_path = 'images/Recipe_Images/'):
 
     msk = np.random.rand(len(df)) < 0.9
     train_df = df[msk]
@@ -119,4 +119,4 @@ if __name__ == '__main__':
     # df = pd.read_csv('/data/recipe_data.csv')
     # prepare_data(df)
 
-    X_train, y_train, X_test, y_test = prepare_data(df, img_path = 'images/Recipe_Images')
+    X_train, y_train, X_test, y_test = prepare_data(df, img_path = 'images/Recipe_Images/')
