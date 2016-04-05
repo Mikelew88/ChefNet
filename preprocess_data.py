@@ -45,18 +45,36 @@ def clean_text(ingred_list):
 
     return ingred_caption_underscored
 
-def vectorize_imgs(X, y, dir_path='images/Recipe_Images'):
+def expand_df_images(df_in, dir_path='images/Recipe_Images'):
     datagen = ImageDataGenerator()
     img_dir = listdir(dir_path)
 
     # We must copy the ingredient vector for each distinct image for a single recipe
     dir_index = [x.split('_')[0] for x in img_dir]
-    df_dir = pd.DataFrame(img_dir, index=)
+    img_path = [dir_path+x for x in img_dir]
 
-    img_paths = {'path':[], 'y':[]}
-    img_paths = [{'path': dir_path+x, 'y': y} for x in img_dir if x.split('_')[0] in zip(X, y)]
+    df_dir = pd.DataFrame(img_path, index=dir_index)
+    df_dir.columns = ['img_path']
 
-    return imread_collection(img_paths['path'], conserve_memory=True), img_paths['y']
+    df_in.index = df_in['id']
+
+    df_out = df_in.merge(df_dir, how='left', left_index=True, right_index=True)
+    return df_out
+
+def vectorize_imgs(img_paths):
+
+    return imread_collection(img_paths, conserve_memory=True)
+
+def vectorize_text(ingred_list):
+    underscored_captions = clean_text(ingred_list)
+
+    ingred_for_vectorizer = [' '.join(x) for x in underscored_captions]
+
+    vectorizer=TfidfVectorizer()
+    trans_vect =vectorizer.fit_transform(ingred_for_vectorizer)
+    array = trans_vect.toarray()
+    words = vectorizer.get_feature_names()
+    return array, words
 
 if __name__ == '__main__':
     temp = vectorize_imgs(['6698', '6788'], ['eggs', 'potato'])

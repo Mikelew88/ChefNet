@@ -23,14 +23,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 max_caption_len = 16
 vocab_size = 10000
 
-def tfidf_text(underscored_captions):
-    ingred_for_vectorizer = [' '.join(x) for x in underscored_captions]
 
-    vectorizer=TfidfVectorizer()
-    trans_vect =vectorizer.fit_transform(ingred_for_vectorizer)
-    array = trans_vect.toarray()
-    words = vectorizer.get_feature_names()
-    return array, words
 
 def get_ingredient_tensor_timeseries(ingredient_lst, nlp, timesteps):
     '''

@@ -1,5 +1,6 @@
 from __future__ import print_function
 import pandas as pd
+import numpy as np
 
 from keras.datasets import cifar10
 from keras.preprocessing.image import ImageDataGenerator
@@ -9,10 +10,9 @@ from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.optimizers import SGD
 from keras.utils import np_utils
 
-from preprocess_data import clean_text, vectorize_imgs
-from featurize import tfidf_text
+from preprocess_data import vectorize_text, vectorize_imgs, expand_df_images
 
-from sklearn.cross_validation import train_test_split
+# from sklearn.cross_validation import train_test_split
 
 from pymongo import MongoClient
 
@@ -21,43 +21,34 @@ nb_classes = 10
 nb_epoch = 200
 data_augmentation = True
 
-def prepare_data(df):
-
-    # input image dimensions
-    img_rows, img_cols = 250, 250
-    # images are RGB
-    img_channels = 3
+def prepare_data(df, img_path = 'images/Recipe_Images'):
 
     msk = np.random.rand(len(df)) < 0.9
     train_df = df[msk]
     test_df = df[~msk]
 
-    # X = df['id']
+    train_df = expand_df_images(train_df, img_path)
+    test_df = expand_df_images(test_df, img_path)
 
-    # #train test split
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
+    X_train = vectorize_imgs(train_df['img_path'])
+    y_train = vectorize_text(train_df['ingred_list'])
 
-    # We need to assign the same ingredients to multiple images
-    X_train, y_train = vectorize_imgs(df_train, '/data/Recipe_Images')
-
-    # clean_text parses keywords from ingredients and creates underscored_captions
-    ingred_text = clean_text(df['ingred_list'])
-
-    # y is a np array from tfidf, y_names are the labels
-    y, y_names = tfidf_text(ingred_text)
+    X_test =  vectorize_imgs(test_df['img_path'])
+    y_test = vectorize_text(test_df['ingred_list'])
 
 
-    print('X_train shape:', X_train.shape)
-    print(X_train.shape[0], 'train samples')
-    print(X_test.shape[0], 'test samples')
+    # print('X_train shape:', X_train.shape)
+    # print(X_train.shape[0], 'train samples')
+    # print(X_test.shape[0], 'test samples')
 
-    return X, y #, y_names
-    # convert class vectors to binary class matrices
-    # Y_train = np_utils.to_categorical(y_train, nb_classes)
-    # Y_test = np_utils.to_categorical(y_test, nb_classes)
-    # I already have tfidf
+    return X_train, y_train, X_test, y_test
 
 def wire_net():
+    # input image dimensions
+    img_rows, img_cols = 250, 250
+    # images are RGB
+    img_channels = 3
+
     model = Sequential()
 
     model.add(Convolution2D(32, 3, 3, border_mode='same',
@@ -128,4 +119,4 @@ if __name__ == '__main__':
     # df = pd.read_csv('/data/recipe_data.csv')
     # prepare_data(df)
 
-    X, y = prepare_data(df)
+    X_train, y_train, X_test, y_test = prepare_data(df, img_path = 'images/Recipe_Images')
