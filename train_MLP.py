@@ -21,17 +21,24 @@ nb_classes = 10
 nb_epoch = 200
 data_augmentation = True
 
-def prepare_data():
-    #retrieve data from mongo
-    db_client = MongoClient()
-    db = db_client['allrecipes']
-    recipe_db = db['recipe_data']
+def prepare_data(df):
 
-    df = pd.DataFrame(list(recipe_db.find()))
     # input image dimensions
     img_rows, img_cols = 250, 250
     # images are RGB
     img_channels = 3
+
+    msk = np.random.rand(len(df)) < 0.9
+    train_df = df[msk]
+    test_df = df[~msk]
+
+    # X = df['id']
+
+    # #train test split
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
+
+    # We need to assign the same ingredients to multiple images
+    X_train, y_train = vectorize_imgs(df_train, '/data/Recipe_Images')
 
     # clean_text parses keywords from ingredients and creates underscored_captions
     ingred_text = clean_text(df['ingred_list'])
@@ -39,22 +46,12 @@ def prepare_data():
     # y is a np array from tfidf, y_names are the labels
     y, y_names = tfidf_text(ingred_text)
 
-    X = df['id']
 
-    X = vectorize_imgs(id_list, '/data/Recipe_Images')
+    print('X_train shape:', X_train.shape)
+    print(X_train.shape[0], 'train samples')
+    print(X_test.shape[0], 'test samples')
 
-    #train test split
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
-    #
-    # # the data, shuffled and split between train and test sets
-    # # (X_train, y_train), (X_test, y_test) = cifar10.load_data()
-    #
-    # print('X_train shape:', X_train.shape)
-    # print(X_train.shape[0], 'train samples')
-    # print(X_test.shape[0], 'test samples')
-
-
-    return X, y, y_names
+    return X, y #, y_names
     # convert class vectors to binary class matrices
     # Y_train = np_utils.to_categorical(y_train, nb_classes)
     # Y_test = np_utils.to_categorical(y_test, nb_classes)
@@ -121,4 +118,14 @@ def wire_net():
         model.fit_generator(datagen.flow(X_train, Y_train, batch_size=batch_size), samples_per_epoch=X_train.shape[0], nb_epoch=nb_epoch, show_accuracy=True, validation_data=(X_test, Y_test), nb_worker=1)
 
 if __name__ == '__main__':
-    X, y, y_names = prepare_data()
+    #retrieve data from mongo
+    db_client = MongoClient()
+    db = db_client['allrecipes']
+    recipe_db = db['recipe_data']
+
+    df = pd.DataFrame(list(recipe_db.find()))
+    # prepare_data(df)
+    # df = pd.read_csv('/data/recipe_data.csv')
+    # prepare_data(df)
+
+    X, y = prepare_data(df)

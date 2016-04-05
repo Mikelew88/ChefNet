@@ -1,5 +1,6 @@
 from os import listdir
 import re
+import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from keras.preprocessing.image import ImageDataGenerator
 from skimage.io import imread_collection, imshow_collection
@@ -44,16 +45,18 @@ def clean_text(ingred_list):
 
     return ingred_caption_underscored
 
-def vectorize_imgs(ingred_list, dir_path='images/Recipe_Images'):
+def vectorize_imgs(X, y, dir_path='images/Recipe_Images'):
     datagen = ImageDataGenerator()
     img_dir = listdir(dir_path)
 
     # We must copy the ingredient vector for each distinct image for a single recipe
-    img_paths = [dir_path+x for x in img_dir if x.split('_')[0] in id_list]
+    dir_index = [x.split('_')[0] for x in img_dir]
+    df_dir = pd.DataFrame(img_dir, index=)
 
-    for i in temp:
-        print i
-    return imread_collection(img_paths, conserve_memory=True)
+    img_paths = {'path':[], 'y':[]}
+    img_paths = [{'path': dir_path+x, 'y': y} for x in img_dir if x.split('_')[0] in zip(X, y)]
+
+    return imread_collection(img_paths['path'], conserve_memory=True), img_paths['y']
 
 if __name__ == '__main__':
-    temp = vectorize_imgs(['6698', '6788'])
+    temp = vectorize_imgs(['6698', '6788'], ['eggs', 'potato'])
