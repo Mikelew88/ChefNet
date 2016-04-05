@@ -67,38 +67,6 @@ image_model = VGG_16('weights/vgg16_weights.h5')
 image_model.add(Flatten())
 image_model.add(Dense(128))
 
-def process_images(img_path):
-    img = cv2.resize(cv2.imread('../../Downloads/cat2.jpg'), (224, 224))
-
-    mean_pixel = [103.939, 116.779, 123.68]
-    img = img.astype(np.float32, copy=False)
-    for c in range(3):
-        img[:, :, c] = img[:, :, c] - mean_pixel[c]
-    img = img.transpose((2,0,1))
-    img = np.expand_dims(img, axis=0)
-    return img
-
-# first, let's define an image model that
-# will encode pictures into 128-dimensional vectors.
-# it should be initialized with pre-trained weights.
-
-# image_model = Sequential()
-# image_model.add(Convolution2D(32, 3, 3, border_mode='valid', input_shape=(3, 100, 100)))
-# image_model.add(Activation('relu'))
-# image_model.add(Convolution2D(32, 3, 3))
-# image_model.add(Activation('relu'))
-# image_model.add(MaxPooling2D(pool_size=(2, 2)))
-#
-# image_model.add(Convolution2D(64, 3, 3, border_mode='valid'))
-# image_model.add(Activation('relu'))
-# image_model.add(Convolution2D(64, 3, 3))
-# image_model.add(Activation('relu'))
-# image_model.add(MaxPooling2D(pool_size=(2, 2)))
-#
-# image_model.add(Flatten())
-# image_model.add(Dense(128))
-
-
 # next, let's define a RNN model that encodes sequences of words
 # into sequences of 128-dimensional word vectors.
 language_model = Sequential()

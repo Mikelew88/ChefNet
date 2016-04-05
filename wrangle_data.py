@@ -1,4 +1,5 @@
-from pymongo import MongoClient import pandas as pd
+from pymongo import MongoClient
+import pandas as pd
 
 if __name__ == '__main__':
     #Store results in mongo
