@@ -72,7 +72,7 @@ class RequestInfoThread(Thread):
         for img in img_band.findAll('img'):
             src = str(img.get('src'))
             if src[-4:]=='.jpg' and i < num_photos:
-                urllib.urlretrieve(src, '/data/Recipe_Images/'+str(self.recipe_id)+'_'+str(i)+'.jpg')
+                urllib.urlretrieve(src, '/data/Recipe_Images_2/'+str(self.recipe_id)+'_'+str(i)+'.jpg')
                 i+=1
         pass
 
