@@ -31,7 +31,8 @@ def expand_df_images(df_in, dir_path):
 
     df_in.index = df_in['id']
 
-    df_out = df_in.merge(df_dir, how='left', left_index=True, right_index=True)
+    df_out = df_in.merge(df_dir, how='inner', left_index=True, right_index=True)
+
     return df_out
 
 def clean_text(ingred_list):
