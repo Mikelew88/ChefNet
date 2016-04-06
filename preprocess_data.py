@@ -142,4 +142,4 @@ def vectorize_text(ingred_list, max_classes):
     return array, words
 
 if __name__ == '__main__':
-    temp = vectorize_imgs(['6698', '6788'], ['eggs', 'potato'])
+    vectorize_imgs(pd.Series(['/data/Recipe_Images/6663_0.jpg', '/data/Recipe_Images/6663_3.jpg']))
