@@ -23,7 +23,7 @@ def expand_df_images(df_in, dir_path):
     # datagen = ImageDataGenerator()
     img_dir = os.listdir(dir_path)
 
-    dir_index = [x.split('_')[0] for x in img_dir]
+    dir_index = [int(x.split('_')[0]) for x in img_dir]
     img_paths = [dir_path+x for x in img_dir]
 
     df_dir = pd.DataFrame(img_paths, index=dir_index)
