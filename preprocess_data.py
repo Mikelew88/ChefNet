@@ -104,7 +104,7 @@ def vectorize_imgs(img_paths):
         Array of vectorized images, and list of rows to drop due to bad images
     '''
 
-    img_gen = imread_collection(img_paths, conserve_memory=True)
+    img_gen = imread_collection(img_paths.values, conserve_memory=True)
     img_list = []
     bad_images = []
 
