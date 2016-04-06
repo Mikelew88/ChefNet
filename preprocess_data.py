@@ -108,6 +108,8 @@ def vectorize_imgs(img_paths):
     img_list = []
     bad_images = []
 
+    import pdb; pdb.set_trace()
+
     for i, img in enumerate(img_gen):
         print i, img
         if len(img.shape) != 3:
