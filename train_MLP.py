@@ -16,11 +16,6 @@ from preprocess_data import vectorize_text, vectorize_imgs, expand_df_images
 
 from pymongo import MongoClient
 
-batch_size = 32
-nb_classes = 10
-nb_epoch = 200
-data_augmentation = True
-
 def prepare_data(df, img_path = 'images/Recipe_Images/'):
 
     msk = np.random.rand(len(df)) < 0.9
@@ -43,7 +38,12 @@ def prepare_data(df, img_path = 'images/Recipe_Images/'):
 
     return X_train, y_train, X_test, y_test
 
-def wire_net():
+def wire_net(X_train, y_train, X_test, y_test):
+    batch_size = 32
+    nb_classes = y_train.shape[1]
+    nb_epoch = 10
+    data_augmentation = False
+
     # input image dimensions
     img_rows, img_cols = 250, 250
     # images are RGB
@@ -84,7 +84,7 @@ def wire_net():
 
     if not data_augmentation:
         print('Not using data augmentation.')
-        model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch, show_accuracy=True, validation_data=(X_test, Y_test), shuffle=True)
+        model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=nb_epoch, show_accuracy=True, validation_data=(X_test, y_test), shuffle=True)
     else:
         print('Using real-time data augmentation.')
 
@@ -120,3 +120,5 @@ if __name__ == '__main__':
     # prepare_data(df)
 
     X_train, y_train, X_test, y_test = prepare_data(df, img_path = 'images/Recipe_Images/')
+
+    model = wire_net(X_train, y_train[0], X_test, y_test[0])
