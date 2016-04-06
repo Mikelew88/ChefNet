@@ -1,4 +1,4 @@
-from os import listdir
+import os
 import re
 import pandas as pd
 import numpy as np
@@ -51,8 +51,6 @@ def clean_text(ingred_list):
     return ingred_caption_underscored
 
 def expand_df_images(df_in, dir_path='images/Recipe_Images/'):
-    datagen = ImageDataGenerator()
-    img_dir = listdir(dir_path)
     '''
     Join ingredient lists to image locations, one to many
 
@@ -65,6 +63,9 @@ def expand_df_images(df_in, dir_path='images/Recipe_Images/'):
     '''
 
     # We must copy the ingredient vector for each distinct image for a single recipe
+    datagen = ImageDataGenerator()
+    img_dir = os.listdir(dir_path)
+
     dir_index = [x.split('_')[0] for x in img_dir]
     img_path = [dir_path+x for x in img_dir]
 
@@ -76,28 +77,44 @@ def expand_df_images(df_in, dir_path='images/Recipe_Images/'):
     df_out = df_in.merge(df_dir, how='left', left_index=True, right_index=True)
     return df_out
 
+def vectorize_data(df):
+    '''
+    Call vectorize images and text, and drop observations with bad .jpgs
+
+    Input:
+        df with img_path and ingred_list columns to be vectorized
+
+    Output:
+        X and y data for Keras
+    '''
+    X, bad_images = vectorize_imgs(df['img_path'])
+    df = df[~df.img_path.isin(bad_images)]
+    y = vectorize_text(df['ingred_list'])
+    return X, y
+
 def vectorize_imgs(img_paths):
     '''
-    Convert .jpgs to arrays
+    Convert .jpgs to arrays, also remove blank files
 
     Input:
         Series of image paths
 
     Output:
-        Array of vectorized images
+        Array of vectorized images, and list of rows to drop due to bad images
     '''
 
     img_gen = imread_collection(img_paths, conserve_memory=True)
     img_list = []
+    bad_images = []
 
     for i, img in enumerate(img_gen):
         if len(img.shape) != 3:
-            print 'Issue with image: {}'.format(img_get.file[i])
-            img_list.append(None)
+            print 'Issue with image: {}'.format(img_gen.files[i])
+            bad_images.append(img_gen.files[i])
         else:
             img_list.append(img)
 
-    return np.array(img_list)
+    return np.array(img_list), bad_images
 
 def vectorize_text(ingred_list):
     '''

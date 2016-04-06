@@ -10,7 +10,7 @@ from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.optimizers import SGD
 from keras.utils import np_utils
 
-from preprocess_data import vectorize_text, vectorize_imgs, expand_df_images
+from preprocess_data import vectorize_data, expand_df_images
 
 # from sklearn.cross_validation import train_test_split
 
@@ -34,16 +34,13 @@ def prepare_data(df, img_path = 'images/Recipe_Images/'):
     train_df = expand_df_images(train_df, img_path)
     test_df = expand_df_images(test_df, img_path)
 
-    X_train = vectorize_imgs(train_df['img_path'])
-    y_train = vectorize_text(train_df['ingred_list'])
+    X_train, y_train = vectorize_data(train_df)
 
-    X_test =  vectorize_imgs(test_df['img_path'])
-    y_test = vectorize_text(test_df['ingred_list'])
+    X_test, y_test =  vectorize_data(test_df)
 
-
-    # print('X_train shape:', X_train.shape)
-    # print(X_train.shape[0], 'train samples')
-    # print(X_test.shape[0], 'test samples')
+    print('X_train shape:', X_train.shape)
+    print(X_train.shape[0], 'train samples')
+    print(X_test.shape[0], 'test samples')
 
     return X_train, y_train, X_test, y_test
 
