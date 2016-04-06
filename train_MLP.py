@@ -14,7 +14,7 @@ from preprocess_data import vectorize_data, expand_df_images
 
 # from sklearn.cross_validation import train_test_split
 
-from pymongo import MongoClient
+# from pymongo import MongoClient
 
 def prepare_data(df, img_path = 'images/Recipe_Images/'):
     '''
@@ -33,6 +33,7 @@ def prepare_data(df, img_path = 'images/Recipe_Images/'):
 
     train_df = expand_df_images(train_df, img_path)
     test_df = expand_df_images(test_df, img_path)
+
 
     X_train, y_train = vectorize_data(train_df, text_classes)
 
@@ -132,6 +133,7 @@ if __name__ == '__main__':
     # df = pd.DataFrame(list(recipe_db.find()))
     # prepare_data(df)
     df = pd.read_csv('/data/recipe_data.csv')
+    df.drop('Unnamed: 0', axis=1, inplace=True)
     # prepare_data(df)
 
     X_train, y_train, X_test, y_test = prepare_data(df, img_path = '/data/Recipe_Images/')

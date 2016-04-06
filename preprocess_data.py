@@ -7,9 +7,36 @@ from keras.preprocessing.image import ImageDataGenerator
 from skimage.io import imread_collection
 # from scipy.misc import imread
 
+def expand_df_images(df_in, dir_path):
+    '''
+    Join ingredient lists to image locations, one to many
+
+    Input:
+        df_in = dataframe of unique recipes
+        dir_path = local path to image folder
+
+    Output:
+        DataFrame with one row for each image of a recipe
+    '''
+
+    # We must copy the ingredient vector for each distinct image for a single recipe
+    # datagen = ImageDataGenerator()
+    img_dir = os.listdir(dir_path)
+
+    dir_index = [x.split('_')[0] for x in img_dir]
+    img_paths = [dir_path+x for x in img_dir]
+
+    df_dir = pd.DataFrame(img_paths, index=dir_index)
+    df_dir.columns = ['img_path']
+
+    df_in.index = df_in['id']
+
+    df_out = df_in.merge(df_dir, how='left', left_index=True, right_index=True)
+    return df_out
+
 def clean_text(ingred_list):
     '''
-    Clean ingredient lists for TFIDF
+    Clean ingredient text to only keep key words for TFIDF
 
     Input:
         List of ingredients as scraped
@@ -49,33 +76,6 @@ def clean_text(ingred_list):
     ingred_caption_underscored = [['_'.join(x) for x in y] for y in ingred_caption]
 
     return ingred_caption_underscored
-
-def expand_df_images(df_in, dir_path='images/Recipe_Images/'):
-    '''
-    Join ingredient lists to image locations, one to many
-
-    Input:
-        df_in = dataframe of unique recipes
-        dir_path = local path to image folder
-
-    Output:
-        DataFrame with one row for each image of a recipe
-    '''
-
-    # We must copy the ingredient vector for each distinct image for a single recipe
-    datagen = ImageDataGenerator()
-    img_dir = os.listdir(dir_path)
-
-    dir_index = [x.split('_')[0] for x in img_dir]
-    img_path = [dir_path+x for x in img_dir]
-
-    df_dir = pd.DataFrame(img_path, index=dir_index)
-    df_dir.columns = ['img_path']
-
-    df_in.index = df_in['id']
-
-    df_out = df_in.merge(df_dir, how='left', left_index=True, right_index=True)
-    return df_out
 
 def vectorize_data(df, max_classes):
     '''

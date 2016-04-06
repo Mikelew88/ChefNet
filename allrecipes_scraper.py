@@ -14,6 +14,15 @@ from threading import Thread
 from RequestInfoThread import RequestInfoThread
 
 def Pull_Recipe_Links(i):
+    '''
+    Pull links to all recipes on a search page
+
+    Input:
+        Search Page Number
+    Output:
+        None
+    '''
+
     """define opener"""
     class MyOpener(urllib.FancyURLopener):
         version = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11'
@@ -91,5 +100,5 @@ if __name__ == '__main__':
     #Spin up mongo data, run mongod first!
 
     # for i in xrange(1,3):
-    
+
     # Pull_Recipe_Links(i)
