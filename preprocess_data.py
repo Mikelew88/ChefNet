@@ -109,6 +109,7 @@ def vectorize_imgs(img_paths):
     bad_images = []
 
     for i, img in enumerate(img_gen):
+        print i, img
         if len(img.shape) != 3:
             print 'Issue with image: {}'.format(img_gen.files[i])
             bad_images.append(img_gen.files[i])
