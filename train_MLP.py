@@ -34,7 +34,7 @@ def prepare_data(df, img_path = 'images/Recipe_Images/'):
     train_df = expand_df_images(train_df, img_path)
     test_df = expand_df_images(test_df, img_path)
 
-
+    import pdb; pdb.set_trace()
     X_train, y_train = vectorize_data(train_df, text_classes)
 
     X_test, y_test =  vectorize_data(test_df, text_classes)
