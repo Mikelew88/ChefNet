@@ -110,11 +110,11 @@ def vectorize_imgs(img_paths):
 
     import pdb; pdb.set_trace()
 
-    for i, img in enumerate(img_gen):
+    for img, file_loc in izip(img_gen, img_gen.files):
         print i, img
         if len(img.shape) != 3:
-            print 'Issue with image: {}'.format(img_gen.files[i])
-            bad_images.append(img_gen.files[i])
+            print 'Issue with image: {}'.format(file_loc)
+            bad_images.append(file_loc)
         else:
             img_list.append(img)
 
