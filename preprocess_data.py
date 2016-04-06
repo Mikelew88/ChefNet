@@ -4,8 +4,8 @@ import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from keras.preprocessing.image import ImageDataGenerator
-from skimage.io import imread_collection, imshow_collection
-from scipy.misc import imread
+from skimage.io import imread_collection
+# from scipy.misc import imread
 
 def clean_text(ingred_list):
     '''
@@ -77,7 +77,7 @@ def expand_df_images(df_in, dir_path='images/Recipe_Images/'):
     df_out = df_in.merge(df_dir, how='left', left_index=True, right_index=True)
     return df_out
 
-def vectorize_data(df):
+def vectorize_data(df, max_classes):
     '''
     Call vectorize images and text, and drop observations with bad .jpgs
 
@@ -89,7 +89,7 @@ def vectorize_data(df):
     '''
     X, bad_images = vectorize_imgs(df['img_path'])
     df = df[~df.img_path.isin(bad_images)]
-    y = vectorize_text(df['ingred_list'])
+    y = vectorize_text(df['ingred_list'], max_classes)
     return X, y
 
 def vectorize_imgs(img_paths):
@@ -116,7 +116,7 @@ def vectorize_imgs(img_paths):
 
     return np.array(img_list), bad_images
 
-def vectorize_text(ingred_list):
+def vectorize_text(ingred_list, max_classes):
     '''
     Convert Ingredients to TFIDF
 
@@ -131,7 +131,7 @@ def vectorize_text(ingred_list):
 
     ingred_for_vectorizer = [' '.join(x) for x in underscored_captions]
 
-    vectorizer=TfidfVectorizer()
+    vectorizer=TfidfVectorizer(max_features=max_classes)
     trans_vect =vectorizer.fit_transform(ingred_for_vectorizer)
     array = trans_vect.toarray()
     words = vectorizer.get_feature_names()

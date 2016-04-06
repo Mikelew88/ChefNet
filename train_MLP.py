@@ -26,7 +26,7 @@ def prepare_data(df, img_path = 'images/Recipe_Images/'):
     Output:
         Training and test vector representations of Image and Ingredient data
     '''
-
+    text_classes = 10000
     msk = np.random.rand(len(df)) < 0.9
     train_df = df[msk]
     test_df = df[~msk]
@@ -34,9 +34,9 @@ def prepare_data(df, img_path = 'images/Recipe_Images/'):
     train_df = expand_df_images(train_df, img_path)
     test_df = expand_df_images(test_df, img_path)
 
-    X_train, y_train = vectorize_data(train_df)
+    X_train, y_train = vectorize_data(train_df, text_classes)
 
-    X_test, y_test =  vectorize_data(test_df)
+    X_test, y_test =  vectorize_data(test_df, text_classes)
 
     print('X_train shape:', X_train.shape)
     print(X_train.shape[0], 'train samples')
@@ -125,15 +125,15 @@ def wire_net(X_train, y_train, X_test, y_test):
 
 if __name__ == '__main__':
     #retrieve data from mongo
-    db_client = MongoClient()
-    db = db_client['allrecipes']
-    recipe_db = db['recipe_data']
-
-    df = pd.DataFrame(list(recipe_db.find()))
+    # db_client = MongoClient()
+    # db = db_client['allrecipes']
+    # recipe_db = db['recipe_data']
+    #
+    # df = pd.DataFrame(list(recipe_db.find()))
     # prepare_data(df)
-    # df = pd.read_csv('/data/recipe_data.csv')
+    df = pd.read_csv('/data/recipe_data.csv')
     # prepare_data(df)
 
-    X_train, y_train, X_test, y_test = prepare_data(df, img_path = 'images/Recipe_Images/')
+    X_train, y_train, X_test, y_test = prepare_data(df, img_path = '/data/Recipe_Images/')
 
     model = wire_net(X_train, y_train[0], X_test, y_test[0])
