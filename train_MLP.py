@@ -17,6 +17,15 @@ from preprocess_data import vectorize_text, vectorize_imgs, expand_df_images
 from pymongo import MongoClient
 
 def prepare_data(df, img_path = 'images/Recipe_Images/'):
+    '''
+    Prepare Images and Ingredients for NN
+
+    Input:
+        df = Scraped data
+
+    Output:
+        Training and test vector representations of Image and Ingredient data
+    '''
 
     msk = np.random.rand(len(df)) < 0.9
     train_df = df[msk]
@@ -39,6 +48,15 @@ def prepare_data(df, img_path = 'images/Recipe_Images/'):
     return X_train, y_train, X_test, y_test
 
 def wire_net(X_train, y_train, X_test, y_test):
+    '''
+    Create a preliminary Keras model
+
+    Input:
+        X is vectorized images, y is TFIDF vector of ingredients, split into training and test sets
+
+    Output:
+        Trained CNN model
+    '''
     batch_size = 32
     nb_classes = y_train.shape[1]
     nb_epoch = 10
@@ -51,8 +69,8 @@ def wire_net(X_train, y_train, X_test, y_test):
 
     model = Sequential()
 
-    model.add(Convolution2D(32, 3, 3, border_mode='same',
-                        input_shape=(img_channels, img_rows, img_cols)))
+    model.add(Convolution2D(32, 3, 3, border_mode='same', dim_ordering='tf',
+                        input_shape=(img_rows, img_cols, img_channels)))
     model.add(Activation('relu'))
     model.add(Convolution2D(32, 3, 3))
     model.add(Activation('relu'))

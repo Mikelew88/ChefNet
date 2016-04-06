@@ -9,10 +9,13 @@ from scipy.misc import imread
 
 def clean_text(ingred_list):
     '''
-    Vectorize ingredient text into TFIDF
+    Clean ingredient lists for TFIDF
 
     Input:
+        List of ingredients as scraped
+
     Output:
+        Underscored string for each ingredient
     '''
     ingred_caps = []
     exclude_chars = '[/1234567890().-:,]'
@@ -50,6 +53,16 @@ def clean_text(ingred_list):
 def expand_df_images(df_in, dir_path='images/Recipe_Images/'):
     datagen = ImageDataGenerator()
     img_dir = listdir(dir_path)
+    '''
+    Join ingredient lists to image locations, one to many
+
+    Input:
+        df_in = dataframe of unique recipes
+        dir_path = local path to image folder
+
+    Output:
+        DataFrame with one row for each image of a recipe
+    '''
 
     # We must copy the ingredient vector for each distinct image for a single recipe
     dir_index = [x.split('_')[0] for x in img_dir]
@@ -64,10 +77,39 @@ def expand_df_images(df_in, dir_path='images/Recipe_Images/'):
     return df_out
 
 def vectorize_imgs(img_paths):
-    return [imread(img) for img in img_paths]
-    # return imread_collection(img_paths, conserve_memory=True)
+    '''
+    Convert .jpgs to arrays
+
+    Input:
+        Series of image paths
+
+    Output:
+        Array of vectorized images
+    '''
+
+    img_gen = imread_collection(img_paths, conserve_memory=True)
+    img_list = []
+
+    for i, img in enumerate(img_gen):
+        if len(img.shape) != 3:
+            print 'Issue with image: {}'.format(img_get.file[i])
+            img_list.append(None)
+        else:
+            img_list.append(img)
+
+    return np.array(img_list)
 
 def vectorize_text(ingred_list):
+    '''
+    Convert Ingredients to TFIDF
+
+    Input:
+        Raw ingredient list as scraped
+
+    Output:
+        TFIDF vector
+    '''
+
     underscored_captions = clean_text(ingred_list)
 
     ingred_for_vectorizer = [' '.join(x) for x in underscored_captions]
