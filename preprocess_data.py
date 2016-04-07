@@ -141,11 +141,14 @@ def vectorize_text(ingred_list, max_classes):
 
 if __name__ == '__main__':
     #preprocess all images
-    dir_path = 'images/Recipe_Images'
-    img_dir = os.listdir(dir_path)
+    # dir_path = 'images/Recipe_Images'
+    # img_dir = os.listdir(dir_path)
+    #
+    # dir_index = [int(x.split('_')[0]) for x in img_dir]
 
-    dir_index = [int(x.split('_')[0]) for x in img_dir]
+    df = pd.read_csv('/data/recipe_data.csv')
+    df.drop('Unnamed: 0', axis=1, inplace=True)
 
-
+    key = create_df_image_key(df, '/data/Recipe_Images')
 
     # vectorize_imgs(pd.Series(['/data/Recipe_Images/6663_0.jpg', '/data/Recipe_Images/6663_3.jpg']))
