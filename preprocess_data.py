@@ -111,6 +111,8 @@ def vectorize_imgs(img_paths):
     img_size = 50
 
     for img, file_loc in zip(img_gen, img_gen.files):
+
+        import pdb; pdb.set_trace()
         if len(img.shape) != 3:
             print 'Blank Image: {}'.format(file_loc)
             os.rename(file_loc, "data/Bad_Images/"+file_loc.split('/')[-1])
