@@ -96,7 +96,7 @@ def vectorize_data(df, max_classes):
 
 def vectorize_imgs(img_paths):
     '''
-    Convert .jpgs to arrays, resized and accounting for blank files
+    Convert .jpgs to arrays, resized and swap channel axis
 
     Input:
         Series of image paths
@@ -106,17 +106,17 @@ def vectorize_imgs(img_paths):
     '''
 
     img_gen = imread_collection(img_paths.values, conserve_memory=True)
-    img_array = np.zeros(len(img_gen))
-    bad_images = []
+    img_array = np.empty(len(img_gen),250,250,3)
     img_size = 50
 
     for i, img in enumerate(img_gen):
-        files = img_gen.files[i]
-        img_resized = resize(img, (img_size, img_size))
-        img_array[i,:] = img_reshaped
+        # files = img_gen.files[i]
+        # img_resized = resize(img, (img_size, img_size))
+        img = np.swapaxes(img, 0, 2)
+        img_array[i,:,:,:] = np.swapaxes(img, 1, 2)
 
 
-    return np.array(img_list), bad_images
+    return img_array
 
 def vectorize_text(ingred_list, max_classes):
     '''

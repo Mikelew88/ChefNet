@@ -14,12 +14,11 @@ def load_VGG_16(weights_path='weights/vgg16_weights.h5'):
 
     img_width = 250
     img_height = 250
-    img = imread('images/Recipe_Images/6698_0.jpg')
     # this will contain our generated image
     input_img = K.placeholder((1, 3, img_width, img_height))
 
     # build the VGG16 network with our input_img as input
-    first_layer = ZeroPadding2D((1, 1), dim_ordering='tf', input_shape=(img_width, img_height, 3))
+    first_layer = ZeroPadding2D((1, 1), input_shape=(3, img_width, img_height))
     first_layer.input = input_img
 
     model = Sequential()
@@ -59,6 +58,8 @@ def load_VGG_16(weights_path='weights/vgg16_weights.h5'):
     model.add(Convolution2D(512, 3, 3, activation='relu', name='conv5_3'))
     model.add(MaxPooling2D((2, 2), strides=(2, 2)))
 
+
+
     f = h5py.File(weights_path)
     for k in range(f.attrs['nb_layers']):
         if k >= len(model.layers):
@@ -66,9 +67,13 @@ def load_VGG_16(weights_path='weights/vgg16_weights.h5'):
             break
         g = f['layer_{}'.format(k)]
         weights = [g['param_{}'.format(p)] for p in range(g.attrs['nb_params'])]
+        print k
         model.layers[k].set_weights(weights)
     f.close()
     print('Model loaded.')
+
+    # model.compile(optimizer='sgd', loss='mse')
+    # print('Model Compiled.')
 
     return model
 
@@ -92,13 +97,10 @@ if __name__ == '__main__':
 
     img = imread('images/Recipe_Images/6698_0.jpg')
     img2 = imread('images/Recipe_Images/6698_1.jpg')
-    imgs = [img, img2]
-    X_batch = np.array(imgs)
+    X_batch = np.empty((2, 3, 250, 250))
+    X_batch[0,:,:,:]=np.swapaxes(img, 0, 2)
+    X_batch[1,:,:,:]=np.swapaxes(img2, 0, 2)
 
     model = load_VGG_16()
-
-
-
-    # get_activations = theano.function([model.layers[0].input], model.layers[28].output(train=False), allow_input_downcast=True)
 
     activations = get_activations(model, 29, X_batch)
