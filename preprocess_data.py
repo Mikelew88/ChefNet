@@ -115,7 +115,6 @@ def vectorize_imgs(img_paths):
         img = np.swapaxes(img, 0, 2)
         img_array[i,:,:,:] = np.swapaxes(img, 1, 2)
 
-
     return img_array
 
 def vectorize_text(ingred_list, max_classes):
