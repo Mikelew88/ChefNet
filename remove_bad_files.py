@@ -1,6 +1,6 @@
 import os
 
-def remove_bad_jpgs(dir_path='/data/Recipe_Images'):
+def remove_bad_jpgs(dir_path='/data/Recipe_Images/'):
     '''
     Go through images and remove empty files before preprocessing
 
