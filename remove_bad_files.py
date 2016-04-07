@@ -22,7 +22,7 @@ def remove_empty_jpgs(dir_path='/data/Recipe_Images/'):
 
     for jpg in img_dir:
         jpg_path = dir_path+jpg
-        img = imread(jpg)
+        img = imread(jpg_path)
         if img.shape != (250, 250, 3):
             print 'Empty File: {}'.format(jpg_path)
             os.rename(jpg_path, "/data/Bad_Images/"+jpg)
