@@ -6,6 +6,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from keras.preprocessing.image import ImageDataGenerator
 from skimage.io import imread_collection
 from skimage.transform import resize
+from itertools import izip_longest
 # from scipy.misc import imread
 
 def create_df_image_key(df_in, dir_path):
@@ -33,9 +34,16 @@ def create_df_image_key(df_in, dir_path):
 
     df_in.index = df_in['id']
 
-    df_out = df_in.merge(df_dir, how='inner', left_index=True, right_index=True)
+    id_key = df_in.merge(df_dir, how='inner', left_index=True, right_index=True)
 
-    return key
+    id_key.reset_index(drop=True, inplace=True)
+    id_key.reset_index(drop=False, inplace=True)
+
+    id_key = np.array(id_key[['index','id']])
+
+    np.save('/data/Image_Arrays/id_key.npy', id_key)
+
+    pass
 
 def clean_text(ingred_list):
     '''
@@ -105,17 +113,25 @@ def vectorize_imgs(img_paths):
     Output:
         Array of vectorized images, and list of rows to drop due to bad images
     '''
+    from itertools import izip_longest
 
-    img_gen = imread_collection(img_paths.values, conserve_memory=True)
-    img_array = np.empty((len(img_gen),3,250,250))
+    def grouper(iterable, n, fillvalue=None):
+        args = [iter(iterable)] * n
+        return izip_longest(*args, fillvalue=fillvalue)
 
-    for i, img in enumerate(img_gen):
-        # files = img_gen.files[i]
-        # img_resized = resize(img, (img_size, img_size))
-        img = np.swapaxes(img, 0, 2)
-        img_array[i,:,:,:] = np.swapaxes(img, 1, 2)
+    for i, img_batch in enumerate(grouper(img_paths, 50000)):
 
-    return img_array
+        img_gen = imread_collection(img_batch.values, conserve_memory=True)
+        img_array = np.empty((len(img_batch),3,250,250))
+
+        for i, img in enumerate(img_gen):
+            # files = img_gen.files[i]
+            # img_resized = resize(img, (img_size, img_size))
+            img = np.swapaxes(img, 0, 2)
+            img_array[i,:,:,:] = np.swapaxes(img, 1, 2)
+
+        img_array.save('/data/Image_Arrays/array_'+str(i)+'.npy')
+    pass
 
 def vectorize_text(ingred_list, max_classes):
     '''
@@ -149,6 +165,6 @@ if __name__ == '__main__':
     df = pd.read_csv('/data/recipe_data.csv')
     df.drop('Unnamed: 0', axis=1, inplace=True)
 
-    key = create_df_image_key(df, '/data/Recipe_Images')
+    create_df_image_key(df, '/data/Recipe_Images')
 
     # vectorize_imgs(pd.Series(['/data/Recipe_Images/6663_0.jpg', '/data/Recipe_Images/6663_3.jpg']))
