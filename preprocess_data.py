@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from keras.preprocessing.image import ImageDataGenerator
 from skimage.io import imread_collection
+from skimage.transform import resize
 # from scipy.misc import imread
 
 def expand_df_images(df_in, dir_path):
@@ -95,7 +96,7 @@ def vectorize_data(df, max_classes):
 
 def vectorize_imgs(img_paths):
     '''
-    Convert .jpgs to arrays, also remove blank files
+    Convert .jpgs to arrays, resized and accounting for blank files
 
     Input:
         Series of image paths
@@ -107,6 +108,7 @@ def vectorize_imgs(img_paths):
     img_gen = imread_collection(img_paths.values, conserve_memory=True)
     img_list = []
     bad_images = []
+    img_size = 50
 
     for img, file_loc in zip(img_gen, img_gen.files):
         if len(img.shape) != 3:
@@ -114,7 +116,9 @@ def vectorize_imgs(img_paths):
             os.rename(file_loc, "data/Bad_Images/"+file_loc.split('/')[-1])
             bad_images.append(file_loc)
         else:
-            img_list.append(img)
+            img_resized = resize(img, (img_size, img_size))
+            img_list.append(img_reshaped)
+
 
     return np.array(img_list), bad_images
 
