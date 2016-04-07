@@ -106,7 +106,7 @@ def vectorize_imgs(img_paths):
     '''
 
     img_gen = imread_collection(img_paths.values, conserve_memory=True)
-    img_array = np.empty(len(img_gen),250,250,3)
+    img_array = np.empty((len(img_gen),3,250,250))
     img_size = 50
 
     for i, img in enumerate(img_gen):
