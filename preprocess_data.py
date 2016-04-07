@@ -106,20 +106,14 @@ def vectorize_imgs(img_paths):
     '''
 
     img_gen = imread_collection(img_paths.values, conserve_memory=True)
-    img_list = []
+    img_array = np.zeros(len(img_gen))
     bad_images = []
     img_size = 50
 
-    for img, file_loc in zip(img_gen, img_gen.files):
-
-        import pdb; pdb.set_trace()
-        if len(img.shape) != 3:
-            print 'Blank Image: {}'.format(file_loc)
-            os.rename(file_loc, "data/Bad_Images/"+file_loc.split('/')[-1])
-            bad_images.append(file_loc)
-        else:
-            img_resized = resize(img, (img_size, img_size))
-            img_list.append(img_reshaped)
+    for i, img in enumerate(img_gen):
+        files = img_gen.files[i]
+        img_resized = resize(img, (img_size, img_size))
+        img_array[i,:] = img_reshaped
 
 
     return np.array(img_list), bad_images
