@@ -3,22 +3,18 @@ import datetime
 
 from bs4 import BeautifulSoup
 import urllib, urllib2
-# from selenium import webdriver
-# import re
 
 from pymongo import MongoClient
-# import gridfs
-# import mimetypes
 import multiprocessing
 from threading import Thread
 from RequestInfoThread import RequestInfoThread
 
 def Pull_Recipe_Links(i):
     '''
-    Pull links to all recipes on a search page
+    Pull links to all recipes on a search page and send them to search scraper
 
     Input:
-        Search Page Number
+        Page Number to search for recipe links on
     Output:
         None
     '''
@@ -53,6 +49,17 @@ def Pull_Recipe_Links(i):
 
 
 def scrape_search(link, recipe_db):
+    '''
+    Create RequestInfoThreads for a page of the website
+
+    Input:
+        link = Link to search page
+        recipe_db = recipe MongoDB
+
+    Output:
+        List of data to be stored in MongoDB
+    '''
+
     #Parse url string to locate recipe name and number
     end_recipe_number = link[8:].find('/')+8
     recipe_id = link[8:end_recipe_number]
@@ -77,15 +84,24 @@ def scrape_search(link, recipe_db):
     return mongo_update_lst
 
 def store_data(mongo_update_lst, recipe_db):
+    '''
+    Store Recipe Information in MongoDB
+    '''
     for json_dct in mongo_update_lst:
         if json_dct:
             recipe_db.insert_one(json_dct)
     pass
 
 def already_exists(recipe_db, id):
+    '''
+    Check if a recipe already exists in the database
+    '''
     return bool(recipe_db.find({'id': id}).count())
 
 def run_parallel(num_pages = 10):
+    '''
+    Scrape multiple search pages in parallel
+    '''
 
     page_range = range(1,num_pages)
     pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
