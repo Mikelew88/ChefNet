@@ -8,7 +8,7 @@ from skimage.io import imread_collection
 from skimage.transform import resize
 # from scipy.misc import imread
 
-def expand_df_images(df_in, dir_path):
+def create_df_image_key(df_in, dir_path):
     '''
     Join ingredient lists to image locations, one to many
 
@@ -25,6 +25,7 @@ def expand_df_images(df_in, dir_path):
     img_dir = os.listdir(dir_path)
 
     dir_index = [int(x.split('_')[0]) for x in img_dir]
+
     img_paths = [dir_path+x for x in img_dir]
 
     df_dir = pd.DataFrame(img_paths, index=dir_index)
@@ -34,7 +35,7 @@ def expand_df_images(df_in, dir_path):
 
     df_out = df_in.merge(df_dir, how='inner', left_index=True, right_index=True)
 
-    return df_out
+    return key
 
 def clean_text(ingred_list):
     '''
@@ -89,8 +90,8 @@ def vectorize_data(df, max_classes):
     Output:
         X and y data for Keras
     '''
-    X, bad_images = vectorize_imgs(df['img_path'])
-    df = df[~df.img_path.isin(bad_images)]
+
+    X = vectorize_imgs(df['img_path'])
     y = vectorize_text(df['ingred_list'], max_classes)
     return X, y
 
@@ -107,7 +108,6 @@ def vectorize_imgs(img_paths):
 
     img_gen = imread_collection(img_paths.values, conserve_memory=True)
     img_array = np.empty((len(img_gen),3,250,250))
-    img_size = 50
 
     for i, img in enumerate(img_gen):
         # files = img_gen.files[i]
@@ -133,10 +133,19 @@ def vectorize_text(ingred_list, max_classes):
     ingred_for_vectorizer = [' '.join(x) for x in underscored_captions]
 
     vectorizer=TfidfVectorizer(max_features=max_classes)
+
     trans_vect =vectorizer.fit_transform(ingred_for_vectorizer)
     array = trans_vect.toarray()
     words = vectorizer.get_feature_names()
     return array, words
 
 if __name__ == '__main__':
-    vectorize_imgs(pd.Series(['/data/Recipe_Images/6663_0.jpg', '/data/Recipe_Images/6663_3.jpg']))
+    #preprocess all images
+    dir_path = 'images/Recipe_Images'
+    img_dir = os.listdir(dir_path)
+
+    dir_index = [int(x.split('_')[0]) for x in img_dir]
+
+
+
+    # vectorize_imgs(pd.Series(['/data/Recipe_Images/6663_0.jpg', '/data/Recipe_Images/6663_3.jpg']))
