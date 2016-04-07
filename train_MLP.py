@@ -65,8 +65,8 @@ def wire_net(X_train, y_train, X_test, y_test):
 
     model = Sequential()
 
-    model.add(Convolution2D(32, 3, 3, border_mode='same', dim_ordering='tf',
-                        input_shape=(img_rows, img_cols, img_channels)))
+    model.add(Convolution2D(32, 3, 3, border_mode='same',
+                        input_shape=(img_channels, img_rows, img_cols)))
     model.add(Activation('relu'))
     model.add(Convolution2D(32, 3, 3))
     model.add(Activation('relu'))
