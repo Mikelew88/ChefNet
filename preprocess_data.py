@@ -108,18 +108,13 @@ def vectorize_imgs(img_paths):
     img_list = []
     bad_images = []
 
-    try:
-        for img, file_loc in zip(img_gen, img_gen.files):
-            if len(img.shape) != 3:
-                print 'Blank Image: {}'.format(file_loc)
-                os.rename(file_loc, "data/Bad_Images/"+file_loc.split('/')[-1])
-                bad_images.append(file_loc)
-            else:
-                img_list.append(img)
-    except IOError:
-        print 'Corrupted File: {}'.format(file_loc)
-        os.rename(file_loc, "data/Bad_Images/"+file_loc.split('/')[-1])
-        bad_images.append(file_loc)
+    for img, file_loc in zip(img_gen, img_gen.files):
+        if len(img.shape) != 3:
+            print 'Blank Image: {}'.format(file_loc)
+            os.rename(file_loc, "data/Bad_Images/"+file_loc.split('/')[-1])
+            bad_images.append(file_loc)
+        else:
+            img_list.append(img)
 
     return np.array(img_list), bad_images
 
