@@ -16,7 +16,7 @@ def remove_bad_jpgs(dir_path='/data/Recipe_Images/'):
 
 def remove_empty_jpgs(dir_path='/data/Recipe_Images/'):
     '''
-    Go through images and remove blank images
+    Go through images and remove blank and/or black and white images
     '''
     img_dir = os.listdir(dir_path)
 
