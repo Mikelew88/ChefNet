@@ -16,6 +16,8 @@ from preprocess_data import vectorize_data, expand_df_images
 
 # from pymongo import MongoClient
 
+
+
 def prepare_data(df, img_path = 'images/Recipe_Images/'):
     '''
     Prepare Images and Ingredients for NN
@@ -42,6 +44,12 @@ def prepare_data(df, img_path = 'images/Recipe_Images/'):
     print(X_test.shape[0], 'test samples')
 
     return X_train, y_train, X_test, y_test
+
+def grouper(iterable, n, fillvalue=None):
+    args = [iter(iterable)] * n
+    return izip_longest(*args, fillvalue=fillvalue)
+
+for i, img_batch in enumerate(grouper(img_paths, 10000)):
 
 def wire_net(X_train, y_train, X_test, y_test):
     '''

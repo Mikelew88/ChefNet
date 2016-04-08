@@ -2,3 +2,5 @@ Weights/*
 data/
 *sandbox.*
 *.pyc
+vgg_imgs/*
+preprocessed_imgs/*

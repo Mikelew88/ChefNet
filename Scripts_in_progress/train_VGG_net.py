@@ -1,4 +1,5 @@
 import h5py
+import sys
 
 import numpy as np
 
@@ -10,10 +11,12 @@ import theano
 
 from skimage.io import imread
 
-def load_VGG_16(weights_path='weights/vgg16_weights.h5'):
+sys.dont_write_bytecode = True
 
-    img_width = 250
-    img_height = 250
+def load_VGG_16(img_size, weights_path='../weights/vgg16_weights.h5'):
+
+    img_width = img_size
+    img_height = img_size
     # this will contain our generated image
     input_img = K.placeholder((1, 3, img_width, img_height))
 
@@ -95,11 +98,11 @@ def get_activations(model, layer, X_batch):
 
 if __name__ == '__main__':
 
-    img = imread('images/Recipe_Images/6698_0.jpg')
-    img2 = imread('images/Recipe_Images/6698_1.jpg')
-    X_batch = np.empty((2, 3, 250, 250))
+    img = imread('../images/Recipe_Images/6698_0.jpg')
+    # img2 = imread('../images/Recipe_Images/6698_1.jpg')
+
+    X_batch = np.empty((1, 3, 250, 250))
     X_batch[0,:,:,:]=np.swapaxes(img, 0, 2)
-    X_batch[1,:,:,:]=np.swapaxes(img2, 0, 2)
 
     model = load_VGG_16()
 
