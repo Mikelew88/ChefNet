@@ -26,7 +26,6 @@ def prepare_data(df, img_path = 'images/Recipe_Images/'):
     Output:
         Training and test vector representations of Image and Ingredient data
     '''
-    text_classes = 10000
     msk = np.random.rand(len(df)) < 0.9
     train_df = df[msk]
     test_df = df[~msk]

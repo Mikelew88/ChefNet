@@ -75,30 +75,33 @@ def load_VGG_16(weights_path='weights/vgg16_weights.h5'):
     return model
 
 def get_activations(model, layer, X_batch):
-        '''
-        INPUT:  (1) Keras Sequential model object
-                (2) integer: The layer to extract weights from
-                (3) 4D numpy array: All the X data you wish to extract
-                    activations for
-        OUTPUT: (1) numpy array: Activations for that layer
-        '''
-        input_layer = model.layers[0].input
-        specified_layer_output = model.layers[layer].get_output(train=False)
-        theano_activation_fn = theano.function([input_layer],
-                                        specified_layer_output,
-                                        allow_input_downcast=True)
-        activations = theano_activation_fn(X_batch)
-        return activations
+    '''
+    Save second to last VGG activations for a batch of images
+    INPUT:
+        model = Keras Sequential model object
+        layer = integer of the layer to extract weights from
+        X_batch = 4D numpy array of all the X data you wish to extract activations for
+    OUTPUT:
+        numpy array: Activations for that layer
+    '''
+    input_layer = model.layers[0].input
+    specified_layer_output = model.layers[layer].get_output(train=False)
+    theano_activation_fn = theano.function([input_layer],
+                                    specified_layer_output,
+                                    allow_input_downcast=True)
+    activations = theano_activation_fn(X_batch)
+
+    return activations
 
 if __name__ == '__main__':
 
-    # img = imread('images/Recipe_Images/6698_0.jpg')
-    # img2 = imread('images/Recipe_Images/6698_1.jpg')
-    # X_batch = np.empty((2, 3, 250, 250))
-    # X_batch[0,:,:,:]=np.swapaxes(img, 0, 2)
-    # X_batch[1,:,:,:]=np.swapaxes(img2, 0, 2)
-    #
-    # model = load_VGG_16()
-    #
-    #
+    img = imread('images/Recipe_Images/6698_0.jpg')
+    img2 = imread('images/Recipe_Images/6698_1.jpg')
+    X_batch = np.empty((2, 3, 250, 250))
+    X_batch[0,:,:,:]=np.swapaxes(img, 0, 2)
+    X_batch[1,:,:,:]=np.swapaxes(img2, 0, 2)
+
+    model = load_VGG_16()
+
+    # (X, 512, 7, 7)
     activations = get_activations(model, 30, X_batch)

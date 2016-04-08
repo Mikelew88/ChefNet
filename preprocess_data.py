@@ -2,12 +2,25 @@ import os
 import re
 import pandas as pd
 import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
+
+from itertools import izip_longest
+from sklearn.feature_extraction.text import CountVectorizer
 from keras.preprocessing.image import ImageDataGenerator
 from skimage.io import imread_collection
 from skimage.transform import resize
 from itertools import izip_longest
+from train_VGG_net import load_VGG_16, get_activations
 # from scipy.misc import imread
+
+def create_validation_set(df):
+    '''
+    Create set of recipes that will be set aside for validation
+    '''
+    msk = np.random.rand(len(df)) < 0.90
+    train_df = df[msk]
+    vald_df = df[~msk]
+
+    return train_df, test_df
 
 def create_df_image_key(df_in, dir_path):
     '''
@@ -34,16 +47,13 @@ def create_df_image_key(df_in, dir_path):
 
     df_in.index = df_in['id']
 
-    id_key = df_in.merge(df_dir, how='inner', left_index=True, right_index=True)
+    df_out = df_in.merge(df_dir, how='inner', left_index=True, right_index=True)
 
-    id_key.reset_index(drop=True, inplace=True)
-    id_key.reset_index(drop=False, inplace=True)
-
-    id_key = np.array(id_key[['index','id']])
+    id_key = np.array(df_out['id'])
 
     np.save('/data/Image_Arrays/id_key.npy', id_key)
 
-    pass
+    return id_key, df_out
 
 def clean_text(ingred_list):
     '''
@@ -88,21 +98,6 @@ def clean_text(ingred_list):
 
     return ingred_caption_underscored
 
-def vectorize_data(df, max_classes):
-    '''
-    Call vectorize images and text, and drop observations with bad .jpgs
-
-    Input:
-        df with img_path and ingred_list columns to be vectorized
-
-    Output:
-        X and y data for Keras
-    '''
-
-    X = vectorize_imgs(df['img_path'])
-    y = vectorize_text(df['ingred_list'], max_classes)
-    return X, y
-
 def vectorize_imgs(img_paths):
     '''
     Convert .jpgs to arrays, resized and swap channel axis
@@ -113,42 +108,42 @@ def vectorize_imgs(img_paths):
     Output:
         Array of vectorized images, and list of rows to drop due to bad images
     '''
-    from itertools import izip_longest
+    model = load_VGG_16
 
     def grouper(iterable, n, fillvalue=None):
         args = [iter(iterable)] * n
         return izip_longest(*args, fillvalue=fillvalue)
 
-    for i, img_batch in enumerate(grouper(img_paths, 50000)):
+    for i, img_batch in enumerate(grouper(img_paths, 10000)):
 
-        img_gen = imread_collection(img_batch.values, conserve_memory=True)
+        img_gen = imread_collection(img_batch, conserve_memory=True)
         img_array = np.empty((len(img_batch),3,250,250))
 
-        for i, img in enumerate(img_gen):
-            # files = img_gen.files[i]
-            # img_resized = resize(img, (img_size, img_size))
+        for img in img_gen:
             img = np.swapaxes(img, 0, 2)
             img_array[i,:,:,:] = np.swapaxes(img, 1, 2)
 
-        img_array.save('/data/Image_Arrays/array_'+str(i)+'.npy')
+        activation = get_activations(model, 30, img_array)
+        np.save('/data/Image_Arrays/array_'+str(i)+'.npy', img_array)
+        np.save('/data/VGG_Arrays/VGG_array_'+str(i)+'.npy', activations)
     pass
 
-def vectorize_text(ingred_list, max_classes):
+def vectorize_text(ingred_list, max_classes=10000):
     '''
-    Convert Ingredients to TFIDF
+    Convert Ingredients to Count Vectors
 
     Input:
         Raw ingredient list as scraped
 
     Output:
-        TFIDF vector
+        Count vector
     '''
 
     underscored_captions = clean_text(ingred_list)
 
     ingred_for_vectorizer = [' '.join(x) for x in underscored_captions]
 
-    vectorizer=TfidfVectorizer(max_features=max_classes)
+    vectorizer=CountVectorizer(max_features=max_classes)
 
     trans_vect =vectorizer.fit_transform(ingred_for_vectorizer)
     array = trans_vect.toarray()
@@ -165,6 +160,8 @@ if __name__ == '__main__':
     df = pd.read_csv('/data/recipe_data.csv')
     df.drop('Unnamed: 0', axis=1, inplace=True)
 
-    create_df_image_key(df, '/data/Recipe_Images')
+    train_df, test_df = create_validation_set(df)
 
-    # vectorize_imgs(pd.Series(['/data/Recipe_Images/6663_0.jpg', '/data/Recipe_Images/6663_3.jpg']))
+    id_key, df_expanded = create_df_image_key(df, '/data/Recipe_Images/')
+
+    # vectorize_imgs(df_expanded['img_path'].values)
