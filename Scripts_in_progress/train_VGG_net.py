@@ -98,13 +98,13 @@ def get_activations(model, layer, X_batch):
 
 if __name__ == '__main__':
 
-    img = imread('../images/Recipe_Images/6698_0.jpg')
-    # img2 = imread('../images/Recipe_Images/6698_1.jpg')
-
-    X_batch = np.empty((1, 3, 250, 250))
-    X_batch[0,:,:,:]=np.swapaxes(img, 0, 2)
-
-    model = load_VGG_16()
-
-    # (X, 512, 7, 7)
-    activations = get_activations(model, 30, X_batch)
+    # img = imread('../images/Recipe_Images/6698_0.jpg')
+    # # img2 = imread('../images/Recipe_Images/6698_1.jpg')
+    #
+    # X_batch = np.empty((1, 3, 250, 250))
+    # X_batch[0,:,:,:]=np.swapaxes(img, 0, 2)
+    #
+    # model = load_VGG_16()
+    #
+    # # (X, 512, 7, 7)
+    # activations = get_activations(model, 30, X_batch)
