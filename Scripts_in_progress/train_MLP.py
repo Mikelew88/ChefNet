@@ -18,18 +18,16 @@ def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return izip_longest(*args, fillvalue=fillvalue)
 
-def batch_train(df, model, max_classes, epochs = 10, batch_size = 50, img_path='/data/preprocessed_imgs'):
-    '''
-    Since all images do not fit into memory, we must batch process ourselves
+def batch_train(df, model, img_size, max_classes, epochs = 10, batch_size = 50, img_path='/data/preprocessed_imgs'):
+    ''' Since all images do not fit into memory, we must batch process ourselves
     '''
     df['clean_ingred'] = clean_text(df['ingred_list'])
     train_df, test_df = create_validation_set(df)
 
     text_vectorizer, words = vectorize_text(train_df['clean_ingred'], max_classes)
 
-
-    for i in epochs:
-        # Shuffle df rows
+    for i in range(epochs):
+        # Shuffle df rows for each epoch
         df.reindex(np.random.permutation(df.index))
 
         train_df, test_df = create_validation_set(df)
@@ -37,17 +35,23 @@ def batch_train(df, model, max_classes, epochs = 10, batch_size = 50, img_path='
         train_df_expanded = create_df_image_key(train_df, img_path)
         test_df_expanded = create_df_image_key(test_df, img_path)
 
-        for i, df_batch in enumerate(grouper(train_df_expanded, batch_size)):
+        train_X = np.array(train_df_expanded['img_path'])
+        train_y = np.array(train_df_expanded['clean_ingred'])
+        train_array = np.vstack((train_X, train_y)).T
 
-            y_train = text_vectorizer.transform(train_df_expanded['clean_ingred']).toarray()
+        for i, batch in enumerate(grouper(train_array, batch_size)):
 
-            X_train = load_imgs(train_df_expanded['img_path'])
+            batch = np.array(batch)
+            mask = ~np.all(np.equal(batch, None), axis=1)
+            batch = batch[mask]
+            X_train = load_imgs(batch[:,0], img_size)
+            y_train = text_vectorizer.transform(batch[:,1]).toarray()
 
-            model.train_on_batch(X_train, y_train,accuracy=True)
+            loss, accuracy = model.train_on_batch(X_train, y_train,accuracy=True)
 
-            print accuracy
+            print 'Batch {} \n Accuracy: {} \n Loss: {}'.format(i, accuracy, loss)
 
-        X_test = load_imgs(test_df_expanded['img_path'])
+        X_test = load_imgs(test_df_expanded['img_path'], img_size)
 
         y_test = text_vectorizer.transform(test_df_expanded['clean_ingred']).toarray()
 
@@ -95,21 +99,23 @@ def build_MLP_net(max_classes, img_size=100):
     sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
     model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
-    print 'We have model!'
+    print 'We have a model!'
 
     return model
 
 
 if __name__ == '__main__':
-    # max_classes=10000
-    # base_path = '/data/'
-    # df = pd.read_csv(base_path+'recipe_data.csv')
-    # model = build_MLP_net(max_classes)
-    # trained_model, words = batch_train(df, model, max_classes,  img_path='/data/temp_imgs/preprocessed_imgs')
+    max_classes=10000
+    img_size = 100
+    base_path = '/data/'
+    df = pd.read_csv(base_path+'recipe_data.csv')
+    model = build_MLP_net(max_classes)
+    trained_model, words = batch_train(df, model, img_size, max_classes,  img_path='/data/temp_imgs/preprocessed_imgs')
 
     # Local test
-    max_classes=5000
-    base_path = '../'
-    df = pd.read_csv(base_path+'data/recipe_data.csv')
-    model = build_MLP_net(max_classes)
-    trained_model, words = batch_train(df, model, max_classes,  img_path='../preprocessed_imgs/preprocessed_imgs/')
+    # max_classes=5000
+    # base_path = '../'
+    # img_size = 100
+    # df = pd.read_csv(base_path+'data/recipe_data.csv')
+    # model = build_MLP_net(max_classes)
+    # trained_model, words = batch_train(df, model, img_size, max_classes,  img_path='../preprocessed_imgs/preprocessed_imgs/')

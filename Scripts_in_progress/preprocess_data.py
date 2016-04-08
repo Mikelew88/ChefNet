@@ -23,8 +23,7 @@ sys.dont_write_bytecode = True
 # from pymongo import MongoClient
 
 def prepare_data(df, img_path = 'images/Recipe_Images/'):
-    '''
-    Prepare Images and Ingredients for NN
+    ''' Prepare Images and Ingredients for NN
 
     Input:
         df = Scraped data
@@ -50,8 +49,7 @@ def prepare_data(df, img_path = 'images/Recipe_Images/'):
     return X_train, y_train, X_test, y_test
 
 def create_validation_set(df):
-    '''
-    Create set of recipes that will be set aside for validation
+    ''' Create set of recipes that will be set aside for validation
     '''
     np.random.seed(seed=33)
     msk = np.random.rand(len(df), ) < 0.90
@@ -63,8 +61,7 @@ def create_validation_set(df):
     return train_df, test_df
 
 def create_df_image_key(df_in, dir_path):
-    '''
-    Join ingredient lists to image locations, one to many
+    ''' Join ingredient lists to image locations, one to many
 
     Input:
         df_in = dataframe of unique recipes
@@ -94,8 +91,7 @@ def create_df_image_key(df_in, dir_path):
     return df_out
 
 def clean_text(ingred_list):
-    '''
-    Clean ingredient text to only keep key words for Vectorizer
+    ''' Clean ingredient text to only keep key words for Vectorizer
 
     Input:
         List of ingredients as scraped
@@ -163,12 +159,13 @@ def clean_text(ingred_list):
                 row_final.append(item_final)
         ingred_caption_underscored.append(row_final)
 
-    return ingred_caption_underscored
+    ingred_for_vectorizer = [' '.join(x) for x in ingred_caption_underscored]
+
+    return ingred_for_vectorizer
 
 
 def preprocess_imgs(base_path, img_keys):
-    '''
-    Save .jpgs arrays and VGG net decomposed arrays
+    ''' Save .jpgs arrays and VGG net decomposed arrays
 
     Input:
         Series of image paths
@@ -206,12 +203,8 @@ def vectorize_text(clean_text, max_classes):
         Count vector
     '''
 
-    ingred_for_vectorizer = [' '.join(x) for x in clean_text]
-
-    # print ingred_for_vectorizer
-
     vectorizer=CountVectorizer(max_features=max_classes)
-    vectorizer.fit(ingred_for_vectorizer)
+    vectorizer.fit(clean_text)
     # trans_vect = vectorizer.transform(ingred_for_vectorizer)
 
     # array = trans_vect.toarray()
@@ -219,10 +212,10 @@ def vectorize_text(clean_text, max_classes):
     return vectorizer, words
 
 def load_imgs(img_arrays, img_size):
-    X = np.empty((len(img_arrays,3,img_size, img_size)))
+    X = np.empty((len(img_arrays),3,img_size, img_size))
 
     for i, img in enumerate(img_arrays):
-        X[i,:,:,:] = np.load('img')
+        X[i,:,:,:] = np.load(img)
 
     return X
 
