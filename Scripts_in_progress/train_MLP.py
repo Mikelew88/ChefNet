@@ -10,40 +10,6 @@ from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.optimizers import SGD
 from keras.utils import np_utils
 
-from preprocess_data import vectorize_data, expand_df_images
-
-# from sklearn.cross_validation import train_test_split
-
-# from pymongo import MongoClient
-
-
-
-def prepare_data(df, img_path = 'images/Recipe_Images/'):
-    '''
-    Prepare Images and Ingredients for NN
-
-    Input:
-        df = Scraped data
-
-    Output:
-        Training and test vector representations of Image and Ingredient data
-    '''
-    msk = np.random.rand(len(df)) < 0.9
-    train_df = df[msk]
-    test_df = df[~msk]
-
-    train_df = expand_df_images(train_df, img_path)
-    test_df = expand_df_images(test_df, img_path)
-    import pdb; pdb.set_trace()
-
-    X_train, y_train = vectorize_data(train_df, text_classes)
-    X_test, y_test =  vectorize_data(test_df, text_classes)
-
-    print('X_train shape:', X_train.shape)
-    print(X_train.shape[0], 'train samples')
-    print(X_test.shape[0], 'test samples')
-
-    return X_train, y_train, X_test, y_test
 
 def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
