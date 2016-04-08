@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from itertools import izip_longest
 
 from sklearn.metrics import r2_score
 
@@ -11,7 +12,7 @@ from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.optimizers import SGD
 from keras.utils import np_utils
 
-from preprocess_data import create_validation_set, create_df_image_key, load_imgs, vectorize_text
+from preprocess_data import create_validation_set, create_df_image_key, load_imgs, clean_text, vectorize_text
 
 def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
@@ -21,7 +22,11 @@ def batch_train(df, model, max_classes, epochs = 10, batch_size = 50, img_path='
     '''
     Since all images do not fit into memory, we must batch process ourselves
     '''
-    df['y'], words = vectorize_text(df['ingred_list'], max_classes)
+    df['clean_ingred'] = clean_text(df['ingred_list'])
+    train_df, test_df = create_validation_set(df)
+
+    text_vectorizer, words = vectorize_text(train_df['clean_ingred'], max_classes)
+
 
     for i in epochs:
         # Shuffle df rows
@@ -32,10 +37,10 @@ def batch_train(df, model, max_classes, epochs = 10, batch_size = 50, img_path='
         train_df_expanded = create_df_image_key(train_df, img_path)
         test_df_expanded = create_df_image_key(test_df, img_path)
 
-
         for i, df_batch in enumerate(grouper(train_df_expanded, batch_size)):
 
-            y_train = train_df_expanded['y']
+            y_train = text_vectorizer.transform(train_df_expanded['clean_ingred']).toarray()
+
             X_train = load_imgs(train_df_expanded['img_path'])
 
             model.train_on_batch(X_train, y_train,accuracy=True)
@@ -43,7 +48,8 @@ def batch_train(df, model, max_classes, epochs = 10, batch_size = 50, img_path='
             print accuracy
 
         X_test = load_imgs(test_df_expanded['img_path'])
-        y_test = test_df_expanded['y']
+
+        y_test = text_vectorizer.transform(test_df_expanded['clean_ingred']).toarray()
 
         y_pred = model.predict_proba(X_test)
         print 'Epoch {}'.format(i)
@@ -89,12 +95,21 @@ def build_MLP_net(max_classes, img_size=100):
     sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
     model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
+    print 'We have model!'
+
     return model
 
 
 if __name__ == '__main__':
-    max_classes=10000
-    base_path = '/data/'
-    df = pd.read_csv(base_path+'recipe_data.csv')
+    # max_classes=10000
+    # base_path = '/data/'
+    # df = pd.read_csv(base_path+'recipe_data.csv')
+    # model = build_MLP_net(max_classes)
+    # trained_model, words = batch_train(df, model, max_classes,  img_path='/data/temp_imgs/preprocessed_imgs')
+
+    # Local test
+    max_classes=5000
+    base_path = '../'
+    df = pd.read_csv(base_path+'data/recipe_data.csv')
     model = build_MLP_net(max_classes)
-    trained_model, words = batch_train(df, model, max_classes,  img_path='/data/temp_imgs/preprocessed_imgs')
+    trained_model, words = batch_train(df, model, max_classes,  img_path='../preprocessed_imgs/preprocessed_imgs/')

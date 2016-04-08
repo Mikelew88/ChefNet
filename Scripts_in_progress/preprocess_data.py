@@ -4,13 +4,15 @@ import pandas as pd
 import numpy as np
 
 from itertools import izip_longest
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from keras.preprocessing.image import ImageDataGenerator
 from skimage.io import imread_collection, imread
 from skimage.transform import resize
 from itertools import izip_longest
 from train_VGG_net import load_VGG_16, get_activations
 # from scipy.misc import imread
+
+from unidecode import unidecode
 
 import sys
 
@@ -93,7 +95,7 @@ def create_df_image_key(df_in, dir_path):
 
 def clean_text(ingred_list):
     '''
-    Clean ingredient text to only keep key words for TFIDF
+    Clean ingredient text to only keep key words for Vectorizer
 
     Input:
         List of ingredients as scraped
@@ -102,35 +104,64 @@ def clean_text(ingred_list):
         Underscored string for each ingredient
     '''
     ingred_caps = []
-    exclude_chars = '[/1234567890().-:,]'
     exclude_words = ['teaspoons', 'teaspoon', 'tablespoon', 'tablespoons' \
                      , 'cup', 'cups', 'ounce', 'ounces', 'bunch', 'bunches' \
-                     , 'large', 'fluid ounce','fluid ounces', 'can', 'cans' \
+                     , 'large', 'medium', 'small', 'in', 'half', 'lengthwise' \
                     , 'pound', 'pounds', 'dash', 'dry', 'lean', 'jars', 'to' \
                     , 'taste', 'slice', 'slices', 'clove', 'cloves' \
                     , 'cube', 'cubes', 'bag', 'bags', 'package', 'packages' \
                     , 'inch', 'inches', 'for', 'a', 'recipe', 'peeled' \
                     , 'grated', 'chopped', 'optional', 'prepared', 'finely' \
-                    , 'crushed', 'degrees', 'F', 'C', 'bottle', 'bottles' \
+                    , 'crushed', 'degrees', 'f', 'c', 'bottle', 'bottles' \
                     , 'rinsed', 'sliced', 'softened', 'halves', 'halved' \
                      ,'cubed', 'drained', 'optional', 'ground', 'or' , '-' \
                     , 'pounded', 'thick', 'diced', 'pinch', 'minced', 'box' \
                     , 'boxes', 'cleaned', 'and', 'cut', 'into', 'rings' \
-                    , 'frozen', 'shredded']
-
+                    , 'frozen', 'shredded', 'trimmed', 'fresh', 'taste' \
+                    , '', ' ', 'uncooked', 'raw', 'bulk', 'pieces', 'piece' \
+                    , 'drop', 'drops', 'can', 'cans', 'fluid ounce' \
+                    , 'fluid ounces', 'boneless', 'boned', 'bone' \
+                    , 'containers', 'container', 'cook', 'cooked', 'cooking' \
+                    , 'unhusked', 'unpeeled', 'trays', 'tub', 'tubs' \
+                    , 'zested', 'of', 'one', 'very', 'thin', 'thinly', 'on' \
+                    , 'all', 'naural', 'organic', 'farm', 'raised', 'fresh' \
+                    , 'pint', 'pints', 'fluid', 'cold', 'about', 'circles']
     ingred_caption = []
+
+    # iterate over recipes
     for item in ingred_list:
         line_final = []
-        for line in item:
+        # iterate over recipe ingredient line items (in mongo db these did not need to be split)
+        for line in item.split(','):
             line_str = []
-            line = re.sub(exclude_chars, '', line)
             for word in line.split():
+                word = word.lower().strip()
+                word = word.strip('-')
+                word = word.strip('[]')
+                word = ''.join(e for e in word if e.isalnum() and not e.isdigit())
                 if word not in exclude_words:
                     line_str.append(word)
-            line_final.append(line_str)
+            if line_str != []:
+                line_final.append(line_str)
         ingred_caption.append(line_final)
 
-    ingred_caption_underscored = [['_'.join(x) for x in y] for y in ingred_caption]
+    exclude_final = ['', ' ', 'room_temperature', 'skinless', 'bone', 'in' \
+    , 'blue', 'blanched', 'black', 'all', 'tri', 'your_favorite', \
+    'zested_juiced', 'your_choice_of_shape', 'your_choice', 'warm', 'divided']
+
+    ingred_caption_underscored = []
+    for row in ingred_caption:
+        row_final=[]
+        for item in row:
+            item_final = '_'.join(item)
+            item_final = item_final.strip('-')
+            item_final = item_final.strip('[]')
+            item_final = item_final.strip('_')
+
+
+            if item_final not in exclude_final:
+                row_final.append(item_final)
+        ingred_caption_underscored.append(row_final)
 
     return ingred_caption_underscored
 
@@ -165,9 +196,8 @@ def preprocess_imgs(base_path, img_keys):
         print 'Save VGG array: {}'.format(img_key)
     pass
 
-def vectorize_text(ingred_list, max_classes):
-    '''
-    Convert Ingredients to Count Vectors
+def vectorize_text(clean_text, max_classes):
+    ''' Convert Ingredients to Count Vectors
 
     Input:
         Raw ingredient list as scraped
@@ -176,16 +206,17 @@ def vectorize_text(ingred_list, max_classes):
         Count vector
     '''
 
-    underscored_captions = clean_text(ingred_list)
+    ingred_for_vectorizer = [' '.join(x) for x in clean_text]
 
-    ingred_for_vectorizer = [' '.join(x) for x in underscored_captions]
+    # print ingred_for_vectorizer
 
     vectorizer=CountVectorizer(max_features=max_classes)
+    vectorizer.fit(ingred_for_vectorizer)
+    # trans_vect = vectorizer.transform(ingred_for_vectorizer)
 
-    trans_vect =vectorizer.fit_transform(ingred_for_vectorizer)
-    array = trans_vect.toarray()
+    # array = trans_vect.toarray()
     words = vectorizer.get_feature_names()
-    return array, words
+    return vectorizer, words
 
 def load_imgs(img_arrays, img_size):
     X = np.empty((len(img_arrays,3,img_size, img_size)))
@@ -209,4 +240,7 @@ def save_processed_imgs_to_disk(base_path='/data/'):
     preprocess_imgs(base_path, df_expanded['file_key'])
 
 if __name__ == '__main__':
-    pass
+    base_path = '../'
+    df = pd.read_csv(base_path+'data/recipe_data.csv')
+    vectorizer, words = vectorize_text(df['ingred_list'], 5000)
+    # array, words = vectorize_text(test, 10000)
