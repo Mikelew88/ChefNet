@@ -12,13 +12,20 @@ from itertools import izip_longest
 from train_VGG_net import load_VGG_16, get_activations
 # from scipy.misc import imread
 
+import sys
+
+sys.dont_write_bytecode = True
+
 def create_validation_set(df):
     '''
     Create set of recipes that will be set aside for validation
     '''
-    msk = np.random.rand(len(df)) < 0.90
+    np.random.seed(seed=33)
+    msk = np.random.rand(len(df), ) < 0.90
     train_df = df[msk]
-    vald_df = df[~msk]
+    test_df = df[~msk]
+
+    np.save('/data/msk.npy', msk)
 
     return train_df, test_df
 
@@ -51,7 +58,7 @@ def create_df_image_key(df_in, dir_path):
 
     id_key = np.array(df_out['id'])
 
-    np.save('/data/Image_Arrays/id_key.npy', id_key)
+    np.save('/data/id_key.npy', id_key)
 
     return id_key, df_out
 
@@ -108,7 +115,7 @@ def vectorize_imgs(img_paths):
     Output:
         Array of vectorized images, and list of rows to drop due to bad images
     '''
-    model = load_VGG_16
+    model = load_VGG_16()
 
     def grouper(iterable, n, fillvalue=None):
         args = [iter(iterable)] * n
@@ -162,6 +169,6 @@ if __name__ == '__main__':
 
     train_df, test_df = create_validation_set(df)
 
-    id_key, df_expanded = create_df_image_key(df, '/data/Recipe_Images/')
+    id_key, df_expanded = create_df_image_key(train_df, '/data/Recipe_Images/')
 
-    # vectorize_imgs(df_expanded['img_path'].values)
+    vectorize_imgs(df_expanded['img_path'].values)
