@@ -97,7 +97,7 @@ def get_activations(model, layer, X_batch):
     return activations
 
 if __name__ == '__main__':
-
+    pass
     # img = imread('../images/Recipe_Images/6698_0.jpg')
     # # img2 = imread('../images/Recipe_Images/6698_1.jpg')
     #

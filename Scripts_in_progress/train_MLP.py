@@ -17,11 +17,11 @@ def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return izip_longest(*args, fillvalue=fillvalue)
 
-def batch_train(df, model, epochs = 10, batch_size = 50, img_path='/data/temp_imgs/preprocessed_imgs'):
+def batch_train(df, model, max_classes, epochs = 10, batch_size = 50, img_path='/data/preprocessed_imgs'):
     '''
     Since all images do not fit into memory, we must batch process ourselves
     '''
-    df['y'], words = vectorize_text(df['ingred_list'])
+    df['y'], words = vectorize_text(df['ingred_list'], max_classes)
 
     for i in epochs:
         # Shuffle df rows
@@ -47,16 +47,17 @@ def batch_train(df, model, epochs = 10, batch_size = 50, img_path='/data/temp_im
 
         y_pred = model.predict_proba(X_test)
         print 'Epoch {}'.format(i)
-        print 'Mean R2 Score: {}'.format(np.mean(r2_score(y_test,y_pred))
+        print 'Mean R2 Score: {}'.format(np.mean(r2_score(y_test,y_pred)))
 
-    return model, words
+        return model, words
 
 
-def build_MLP_net(img_size=100):
+def build_MLP_net(max_classes, img_size=100):
     '''
     Create a preliminary Keras model
     '''
 
+    nb_classes = max_classes
     # images are RGB
     img_channels = 3
 
@@ -92,3 +93,8 @@ def build_MLP_net(img_size=100):
 
 
 if __name__ == '__main__':
+    max_classes=10000
+    base_path = '/data/'
+    df = pd.read_csv(base_path+'recipe_data.csv')
+    model = build_MLP_net(max_classes)
+    trained_model, words = batch_train(df, model, max_classes,  img_path='/data/temp_imgs/preprocessed_imgs')

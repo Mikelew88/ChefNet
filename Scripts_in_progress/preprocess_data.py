@@ -16,8 +16,6 @@ import sys
 
 sys.dont_write_bytecode = True
 
-from preprocess_data import vectorize_data, expand_df_images
-
 # from sklearn.cross_validation import train_test_split
 
 # from pymongo import MongoClient
@@ -167,7 +165,7 @@ def preprocess_imgs(base_path, img_keys):
         print 'Save VGG array: {}'.format(img_key)
     pass
 
-def vectorize_text(ingred_list, max_classes=10000):
+def vectorize_text(ingred_list, max_classes):
     '''
     Convert Ingredients to Count Vectors
 
@@ -190,9 +188,11 @@ def vectorize_text(ingred_list, max_classes=10000):
     return array, words
 
 def load_imgs(img_arrays, img_size):
-    X = np.empty((len(img_arrays,3,img_size, img_size))
+    X = np.empty((len(img_arrays,3,img_size, img_size)))
+
     for i, img in enumerate(img_arrays):
         X[i,:,:,:] = np.load('img')
+
     return X
 
 def save_processed_imgs_to_disk(base_path='/data/'):
@@ -209,3 +209,4 @@ def save_processed_imgs_to_disk(base_path='/data/'):
     preprocess_imgs(base_path, df_expanded['file_key'])
 
 if __name__ == '__main__':
+    pass
