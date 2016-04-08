@@ -107,7 +107,7 @@ def clean_text(ingred_list):
 
 def vectorize_imgs(img_paths):
     '''
-    Convert .jpgs to arrays, resized and swap channel axis
+    Save .jpgs arrays and VGG net decomposed arrays
 
     Input:
         Series of image paths
@@ -115,7 +115,7 @@ def vectorize_imgs(img_paths):
     Output:
         Array of vectorized images, and list of rows to drop due to bad images
     '''
-    model = load_VGG_16()
+    model = load_VGG_16(weights_path='/data/weights/vgg16_weights.h5')
 
     def grouper(iterable, n, fillvalue=None):
         args = [iter(iterable)] * n
