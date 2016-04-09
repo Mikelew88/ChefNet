@@ -228,6 +228,7 @@ def save_processed_imgs_to_disk(base_path='/data/'):
     id_key, df_expanded = create_df_image_key(df, base_path+'Recipe_Images/')
 
     preprocess_imgs(base_path, df_expanded['file_key'])
+    pass
 
 if __name__ == '__main__':
     base_path = '../'

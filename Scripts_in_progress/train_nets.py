@@ -89,7 +89,9 @@ def train_VGG_net():
     trained_model, words = batch_train(df, model, input_shape, max_classes,  img_path='/data/temp_imgs/vgg_imgs/')
 
     pickle_trained_nn(model, 'MLP_VGG_temp')
-    return model
+    np.save('/data/models/words_VGG.npy')
+
+    return trained_model, words
 
 def train_MLP_net():
     ''' Train and save a MLP net '''
@@ -99,13 +101,15 @@ def train_MLP_net():
     model = build_MLP_net(max_classes, input_shape)
     trained_model, words = batch_train(df, model, input_shape, max_classes,  img_path='/data/temp_imgs/preprocessed_imgs/')
 
-    pickle_trained_nn(model, 'MLP_temp')
-    return model
+    pickle_trained_nn(trained_model, 'MLP_temp')
+    np.save('/data/models/words_MLP.npy')
+
+    return trained_model, words
 
 
 if __name__ == '__main__':
-    # model = train_VGG_net()
-    model = train_MLP_net()
+    model = train_VGG_net()
+    # trained_model, words = train_MLP_net()
     # Local test
     # max_classes=5000
     # input_shape = (512,7,7)
