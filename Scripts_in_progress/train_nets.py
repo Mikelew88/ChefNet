@@ -78,7 +78,8 @@ def pickle_trained_nn(model, name):
     ''' Save Pickle of trained net '''
     with open('/data/models/'+name+'.pkl', 'w') as f:
         pickle.dump(model, f)
-
+    pass
+    
 def train_VGG_net():
     ''' Train and save a VGG preprocessed net '''
     max_classes=5000
@@ -89,7 +90,7 @@ def train_VGG_net():
     trained_model, words = batch_train(df, model, input_shape, max_classes,  img_path='/data/temp_imgs/vgg_imgs/')
 
     pickle_trained_nn(model, 'MLP_VGG_temp')
-    np.save('/data/models/words_VGG.npy')
+    np.save('/data/models/words_MLP_VGG.npy')
 
     return trained_model, words
 
@@ -108,8 +109,9 @@ def train_MLP_net():
 
 
 if __name__ == '__main__':
-    model = train_VGG_net()
+    trained_model, words = train_VGG_net()
     # trained_model, words = train_MLP_net()
+
     # Local test
     # max_classes=5000
     # input_shape = (512,7,7)
