@@ -12,8 +12,6 @@ from itertools import izip_longest
 from train_VGG_net import load_VGG_16, get_activations
 # from scipy.misc import imread
 
-from unidecode import unidecode
-
 import sys
 
 sys.dont_write_bytecode = True
@@ -37,7 +35,6 @@ def prepare_data(df, img_path = 'images/Recipe_Images/'):
 
     train_df = expand_df_images(train_df, img_path)
     test_df = expand_df_images(test_df, img_path)
-    import pdb; pdb.set_trace()
 
     X_train, y_train = vectorize_data(train_df, text_classes)
     X_test, y_test =  vectorize_data(test_df, text_classes)
@@ -211,9 +208,9 @@ def vectorize_text(clean_text, max_classes):
     words = vectorizer.get_feature_names()
     return vectorizer, words
 
-def load_imgs(img_arrays, img_size):
-    X = np.empty((len(img_arrays),3,img_size, img_size))
-
+def load_imgs(img_arrays, input_shape):
+    x, y, z = input_shape
+    X = np.empty((len(img_arrays),x,y,z))
     for i, img in enumerate(img_arrays):
         X[i,:,:,:] = np.load(img)
 

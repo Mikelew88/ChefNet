@@ -1,1 +1,3 @@
-# Galvanize_Project
+# Welcome to Ingredient Identifier
+
+Here you may find my Galvanize Capstone Project.

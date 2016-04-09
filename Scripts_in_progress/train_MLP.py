@@ -1,3 +1,5 @@
+import sys
+
 import pandas as pd
 import numpy as np
 from itertools import izip_longest
@@ -12,13 +14,14 @@ from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.optimizers import SGD
 from keras.utils import np_utils
 
+import cPickle as pickle
+
 from preprocess_data import create_validation_set, create_df_image_key, load_imgs, clean_text, vectorize_text
+from build_models import build_MLP_net, build_VGG_net
 
-def grouper(iterable, n, fillvalue=None):
-    args = [iter(iterable)] * n
-    return izip_longest(*args, fillvalue=fillvalue)
+sys.dont_write_bytecode = True
 
-def batch_train(df, model, img_size, max_classes, epochs = 10, batch_size = 50, img_path='/data/preprocessed_imgs'):
+def batch_train(df, model, input_shape, max_classes, epochs = 10, batch_size = 50, img_path='/data/preprocessed_imgs'):
     ''' Since all images do not fit into memory, we must batch process ourselves
     '''
     df['clean_ingred'] = clean_text(df['ingred_list'])
@@ -26,7 +29,7 @@ def batch_train(df, model, img_size, max_classes, epochs = 10, batch_size = 50, 
 
     text_vectorizer, words = vectorize_text(train_df['clean_ingred'], max_classes)
 
-    for i in range(epochs):
+    for e in range(1,epochs+1):
         # Shuffle df rows for each epoch
         df.reindex(np.random.permutation(df.index))
 
@@ -39,83 +42,73 @@ def batch_train(df, model, img_size, max_classes, epochs = 10, batch_size = 50, 
         train_y = np.array(train_df_expanded['clean_ingred'])
         train_array = np.vstack((train_X, train_y)).T
 
+        # skip last batch
+        stop_batch = train_array.shape[0]/batch_size
+
         for i, batch in enumerate(grouper(train_array, batch_size)):
+            if i < stop_batch:
+                batch = np.array(batch)
+                # mask = ~np.all(np.equal(batch, None), axis=1)
+                # batch = batch[mask]
+                X_train = load_imgs(batch[:,0], input_shape)
+                y_train = text_vectorizer.transform(batch[:,1]).toarray()
 
-            batch = np.array(batch)
-            mask = ~np.all(np.equal(batch, None), axis=1)
-            batch = batch[mask]
-            X_train = load_imgs(batch[:,0], img_size)
-            y_train = text_vectorizer.transform(batch[:,1]).toarray()
+                loss, accuracy = model.train_on_batch(X_train, y_train,accuracy=True)
 
-            loss, accuracy = model.train_on_batch(X_train, y_train,accuracy=True)
+                print 'Batch {} \n Accuracy: {} \n Loss: {}'.format(i, accuracy, loss)
 
-            print 'Batch {} \n Accuracy: {} \n Loss: {}'.format(i, accuracy, loss)
-
-        X_test = load_imgs(test_df_expanded['img_path'], img_size)
+        X_test = load_imgs(test_df_expanded['img_path'], input_shape)
 
         y_test = text_vectorizer.transform(test_df_expanded['clean_ingred']).toarray()
 
         y_pred = model.predict_proba(X_test)
-        print 'Epoch {}'.format(i)
+        print 'Epoch {}'.format(e)
         print 'Mean R2 Score: {}'.format(np.mean(r2_score(y_test,y_pred)))
+        print '\n \n \n'
 
-        return model, words
+    return model, words
 
-
-def build_MLP_net(max_classes, img_size=100):
+def grouper(iterable, n, fillvalue=None):
+    ''' helper function for batching
     '''
-    Create a preliminary Keras model
-    '''
+    args = [iter(iterable)] * n
+    return izip_longest(*args, fillvalue=fillvalue)
 
-    nb_classes = max_classes
-    # images are RGB
-    img_channels = 3
+def pickle_trained_nn(model, name):
+    ''' Save Pickle of trained net '''
+    with open('/data/models/'+name+'.pkl', 'w') as f:
+        pickle.dump(model, f)
 
-    model = Sequential()
+def train_VGG_net():
+    ''' Train and save a VGG preprocessed net '''
+    max_classes=5000
+    input_shape = (512,3,3)
+    base_path = '/data/'
+    df = pd.read_csv(base_path+'recipe_data.csv')
+    model = build_VGG_net(max_classes, input_shape)
+    trained_model, words = batch_train(df, model, input_shape, max_classes,  img_path='/data/temp_imgs/vgg_imgs/')
 
-    model.add(Convolution2D(32, 3, 3, border_mode='same',
-                        input_shape=(img_channels, img_size, img_size)))
-    model.add(Activation('relu'))
-    model.add(Convolution2D(32, 3, 3))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.25))
+    pickle_trained_nn(model, 'MLP_VGG_temp')
+    return model
 
-    model.add(Convolution2D(64, 3, 3, border_mode='same'))
-    model.add(Activation('relu'))
-    model.add(Convolution2D(64, 3, 3))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.25))
+def train_MLP_net():
+    ''' Train and save a MLP net '''
+    max_classes=5000
+    input_shape = (3,100,100)
+    df = pd.read_csv('/data/recipe_data.csv')
+    model = build_MLP_net(max_classes, input_shape)
+    trained_model, words = batch_train(df, model, input_shape, max_classes,  img_path='/data/temp_imgs/preprocessed_imgs/')
 
-    model.add(Flatten())
-    model.add(Dense(512))
-    model.add(Activation('relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(nb_classes))
-    model.add(Activation('softmax'))
-
-    # let's train the model using SGD + momentum (how original).
-    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-    model.compile(loss='categorical_crossentropy', optimizer=sgd)
-
-    print 'We have a model!'
-
+    pickle_trained_nn(model, 'MLP_temp')
     return model
 
 
 if __name__ == '__main__':
-    max_classes=10000
-    img_size = 100
-    base_path = '/data/'
-    df = pd.read_csv(base_path+'recipe_data.csv')
-    model = build_MLP_net(max_classes)
-    trained_model, words = batch_train(df, model, img_size, max_classes,  img_path='/data/temp_imgs/preprocessed_imgs')
-
+    # model = train_VGG_net()
+    model = train_MLP_net()
     # Local test
     # max_classes=5000
-    # base_path = '../'
-    # img_size = 100
-    # df = pd.read_csv(base_path+'data/recipe_data.csv')
-    # model = build_MLP_net(max_classes)
-    # trained_model, words = batch_train(df, model, img_size, max_classes,  img_path='../preprocessed_imgs/preprocessed_imgs/')
+    # input_shape = (512,7,7)
+    # df = pd.read_csv('../data/recipe_data.csv')
+    # model = build_MLP_net(max_classes, input_shape)
+    # trained_model, words = batch_train(df, model, input_shape, max_classes,  img_path='../images/vgg_imgs/')
