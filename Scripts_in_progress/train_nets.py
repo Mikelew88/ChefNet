@@ -17,7 +17,7 @@ from keras.utils import np_utils
 import cPickle as pickle
 
 from preprocess_data import create_validation_set, create_df_image_key, load_imgs, clean_text, vectorize_text
-from build_models import build_MLP_net, build_VGG_net
+from build_models import build_MLP_net, build_VGG_net, build_LSTM_net
 
 sys.dont_write_bytecode = True
 
@@ -79,7 +79,7 @@ def pickle_trained_nn(model, name):
     with open('/data/models/'+name+'.pkl', 'w') as f:
         pickle.dump(model, f)
     pass
-    
+
 def train_VGG_net():
     ''' Train and save a VGG preprocessed net '''
     max_classes=5000
@@ -103,14 +103,29 @@ def train_MLP_net():
     trained_model, words = batch_train(df, model, input_shape, max_classes,  img_path='/data/temp_imgs/preprocessed_imgs/')
 
     pickle_trained_nn(trained_model, 'MLP_temp')
-    np.save('/data/models/words_MLP.npy')
+    np.save('/data/models/words_MLP.npy', words)
 
     return trained_model, words
 
+def train_LSTM_net():
+    ''' Train and save a VGG preprocessed net '''
+    max_classes=5000
+    input_shape = (512,3,3)
+    base_path = '/data/'
+    df = pd.read_csv(base_path+'recipe_data.csv')
+    model = build_LSTM_net(max_classes, input_shape)
+    trained_model, words = batch_train(df, model, input_shape, max_classes,  img_path='/data/temp_imgs/vgg_imgs/')
+
+    pickle_trained_nn(model, 'LSTM_temp')
+    np.save('/data/models/words_LSTM.npy')
+
+    return trained_model, words
 
 if __name__ == '__main__':
-    trained_model, words = train_VGG_net()
+    # trained_model, words = train_VGG_net()
     # trained_model, words = train_MLP_net()
+    trained_model, words = train_LSTM_net()
+
 
     # Local test
     # max_classes=5000
