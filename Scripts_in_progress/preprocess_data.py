@@ -12,6 +12,8 @@ from itertools import izip_longest
 from train_VGG_net import load_VGG_16, get_activations
 # from scipy.misc import imread
 
+from nltk.stem import WordNetLemmatizer
+
 import sys
 
 sys.dont_write_bytecode = True
@@ -96,6 +98,9 @@ def clean_text(ingred_list):
     Output:
         Underscored string for each ingredient
     '''
+
+    wordnet_lemmatizer = WordNetLemmatizer()
+
     ingred_caps = []
     exclude_words = ['teaspoons', 'teaspoon', 'tablespoon', 'tablespoons' \
                      , 'cup', 'cups', 'ounce', 'ounces', 'bunch', 'bunches' \
@@ -118,7 +123,9 @@ def clean_text(ingred_list):
                     , 'unhusked', 'unpeeled', 'trays', 'tub', 'tubs' \
                     , 'zested', 'of', 'one', 'very', 'thin', 'thinly', 'on' \
                     , 'all', 'naural', 'organic', 'farm', 'raised', 'fresh' \
-                    , 'pint', 'pints', 'fluid', 'cold', 'about', 'circles']
+                    , 'pint', 'pints', 'fluid', 'cold', 'about', 'circles' \
+                    , 'your', 'favorite', 'room', 'temperature', 'skinless' \
+                    , 'blanched', 'beaten']
     ingred_caption = []
 
     # iterate over recipes
@@ -132,6 +139,7 @@ def clean_text(ingred_list):
                 word = word.strip('-')
                 word = word.strip('[]')
                 word = ''.join(e for e in word if e.isalnum() and not e.isdigit())
+                word = wordnet_lemmatizer.lemmatize(word)
                 if word not in exclude_words:
                     line_str.append(word)
             if line_str != []:
@@ -144,19 +152,16 @@ def clean_text(ingred_list):
 
     ingred_caption_underscored = []
     for row in ingred_caption:
-        row_final=[]
+        row_final=['#START#']
         for item in row:
-            item_final = '_'.join(item)
+            item_final = ' '.join(item)
             item_final = item_final.strip('-')
-            item_final = item_final.strip('[]')
-            item_final = item_final.strip('_')
-
 
             if item_final not in exclude_final:
                 row_final.append(item_final)
-        ingred_caption_underscored.append(row_final)
+        ingred_caption_underscored.append(row_final.append('#END#'))
 
-    ingred_for_vectorizer = [' '.join(x) for x in ingred_caption_underscored]
+    ingred_for_vectorizer = [', '.join(x) for x in ingred_caption_underscored]
 
     return ingred_for_vectorizer
 
@@ -233,5 +238,6 @@ def save_processed_imgs_to_disk(base_path='/data/'):
 if __name__ == '__main__':
     base_path = '../'
     df = pd.read_csv(base_path+'data/recipe_data.csv')
-    vectorizer, words = vectorize_text(df['ingred_list'], 5000)
+    # vectorizer, words = vectorize_text(df['ingred_list'], 1000)
+    words = clean_text(df['ingred_list'])
     # array, words = vectorize_text(test, 10000)

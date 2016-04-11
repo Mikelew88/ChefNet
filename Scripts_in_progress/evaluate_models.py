@@ -32,5 +32,5 @@ def predict_img(model, words, id, img_num, img_folder, df):
 if __name__ == '__main__':
     df = pd.read_csv('/data/recipe_data.csv')
 
-    model, words = open_pkl_and_words('MLP_VGG')
-    pred_words, true_y = predict_img(model, words, '8694', '4', 'vgg_imgs/', df)
+    model, words = open_pkl_and_words('MLP')
+    pred_words, true_y = predict_img(model, words, '8694', '4', 'preprocessed_imgs/', df)
