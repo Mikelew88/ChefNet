@@ -2,6 +2,7 @@ import os
 import re
 import pandas as pd
 import numpy as np
+import itertools
 
 from itertools import izip_longest
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
@@ -125,7 +126,10 @@ def clean_text(ingred_list):
                     , 'all', 'naural', 'organic', 'farm', 'raised', 'fresh' \
                     , 'pint', 'pints', 'fluid', 'cold', 'about', 'circles' \
                     , 'your', 'favorite', 'room', 'temperature', 'skinless' \
-                    , 'blanched', 'beaten']
+                    , 'blanched', 'beaten', 'thawed', 'lightly', 'light' \
+                    , 'fourth', 'at', 'broken', 'quart', 'freshly', 'drain' \
+                    , 'reserve', 'liquid', 'degree', 'mashed', 'square' \
+                    , 'on', 'crosswise', 'strip']
     ingred_caption = []
 
     # iterate over recipes
@@ -146,24 +150,24 @@ def clean_text(ingred_list):
                 line_final.append(line_str)
         ingred_caption.append(line_final)
 
-    exclude_final = ['', ' ', 'room_temperature', 'skinless', 'bone', 'in' \
-    , 'blue', 'blanched', 'black', 'all', 'tri', 'your_favorite', \
-    'zested_juiced', 'your_choice_of_shape', 'your_choice', 'warm', 'divided']
-
-    ingred_caption_underscored = []
+    ingred_caption_final = []
     for row in ingred_caption:
-        row_final=['#START#']
+        # row_final=['#START#']
+        row_final = []
         for item in row:
             item_final = ' '.join(item)
             item_final = item_final.strip('-')
 
-            if item_final not in exclude_final:
-                row_final.append(item_final)
-        ingred_caption_underscored.append(row_final.append('#END#'))
+            row_final.append(str(item_final))
 
-    ingred_for_vectorizer = [', '.join(x) for x in ingred_caption_underscored]
+        # row_final.append('#END#')
+        row_final.append('#')
 
-    return ingred_for_vectorizer
+        ingred_caption_final.append(row_final)
+
+    # ingred_for_vectorizer = [', '.join(x) for x in ingred_caption_underscored]
+    vocab = set(itertools.chain.from_iterable(ingred_caption_final))
+    return ingred_caption_final, vocab
 
 
 def preprocess_imgs(base_path, img_keys):
@@ -195,7 +199,7 @@ def preprocess_imgs(base_path, img_keys):
         print 'Save VGG array: {}'.format(img_key)
     pass
 
-def vectorize_text(clean_text, max_classes):
+def vectorize_text(text_list, vocab):
     ''' Convert Ingredients to Count Vectors
 
     Input:
@@ -205,13 +209,33 @@ def vectorize_text(clean_text, max_classes):
         Count vector
     '''
 
-    vectorizer=CountVectorizer(max_features=max_classes)
-    vectorizer.fit(clean_text)
-    # trans_vect = vectorizer.transform(ingred_for_vectorizer)
+    corpus = []
+    for recipe in text_list:
+        for word in recipe:
+            corpus.append(word)
 
-    # array = trans_vect.toarray()
-    words = vectorizer.get_feature_names()
-    return vectorizer, words
+    # text = ' '.join(text_list)
+
+    print 'corpus length: ' + str(len(corpus))
+
+    print 'total words: ' + str(len(vocab))
+    word_indices = dict((c, i) for i, c in enumerate(sorted(vocab)))
+    indices_word = dict((i, c) for i, c in enumerate(sorted(vocab)))
+
+    print 'Vectorization...'
+    y = np.zeros((len(text_list), len(vocab)), dtype=np.bool)
+    for i, sentence in enumerate(text_list):
+        for t, word in enumerate(sentence):
+            y[i, word_indices[word]] = 1
+
+
+    # vectorizer=CountVectorizer(max_features=max_classes)
+    # vectorizer.fit(clean_text)
+    # # trans_vect = vectorizer.transform(ingred_for_vectorizer)
+    #
+    # # array = trans_vect.toarray()
+    # words = vectorizer.get_feature_names()
+    return y, indices_word
 
 def load_imgs(img_arrays, input_shape):
     x, y, z = input_shape
@@ -239,5 +263,6 @@ if __name__ == '__main__':
     base_path = '../'
     df = pd.read_csv(base_path+'data/recipe_data.csv')
     # vectorizer, words = vectorize_text(df['ingred_list'], 1000)
-    words = clean_text(df['ingred_list'])
+    words, vocab = clean_text(df['ingred_list'])
+    y, indices_word = vectorize_text(words, vocab)
     # array, words = vectorize_text(test, 10000)

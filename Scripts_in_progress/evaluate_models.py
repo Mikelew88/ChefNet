@@ -1,4 +1,4 @@
-import cPickle as pickle
+https://www.youtube.com/watch?v=yCC09vCHzF8import cPickle as pickle
 import numpy as np
 import pandas as pd
 

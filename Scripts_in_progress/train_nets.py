@@ -123,8 +123,8 @@ def train_LSTM_net():
 
 if __name__ == '__main__':
     # trained_model, words = train_VGG_net()
-    trained_model, words = train_MLP_net()
-    # trained_model, words = train_LSTM_net()
+    # trained_model, words = train_MLP_net()
+    trained_model, words = train_LSTM_net()
 
 
     # Local test
