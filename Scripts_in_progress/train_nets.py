@@ -90,7 +90,7 @@ def train_VGG_net():
     trained_model, words = batch_train(df, model, input_shape, max_classes,  img_path='/data/temp_imgs/vgg_imgs/')
 
     pickle_trained_nn(model, 'MLP_VGG_temp')
-    np.save('/data/models/words_MLP_VGG.npy')
+    np.save('/data/models/words_MLP_VGG.npy', words)
 
     return trained_model, words
 
@@ -117,14 +117,14 @@ def train_LSTM_net():
     trained_model, words = batch_train(df, model, input_shape, max_classes,  img_path='/data/temp_imgs/vgg_imgs/')
 
     pickle_trained_nn(model, 'LSTM_temp')
-    np.save('/data/models/words_LSTM.npy')
+    np.save('/data/models/words_LSTM.npy', words)
 
     return trained_model, words
 
 if __name__ == '__main__':
     # trained_model, words = train_VGG_net()
-    # trained_model, words = train_MLP_net()
-    trained_model, words = train_LSTM_net()
+    trained_model, words = train_MLP_net()
+    # trained_model, words = train_LSTM_net()
 
 
     # Local test
