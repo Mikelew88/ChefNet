@@ -9,14 +9,20 @@ import numpy as np
 import itertools
 
 from itertools import izip_longest
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from keras.preprocessing.image import ImageDataGenerator
-from skimage.io import imread_collection, imread
-from skimage.transform import resize
 from itertools import izip_longest
-from train_VGG_net import load_VGG_16, get_activations
 
 from nltk.stem import WordNetLemmatizer
+
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.preprocessing import MultiLabelBinarizer
+
+from keras.preprocessing.image import ImageDataGenerator
+
+from skimage.io import imread_collection, imread
+from skimage.transform import resize
+
+from train_VGG_net import load_VGG_16, get_activations
+
 
 def prepare_data(df, img_path = 'images/Recipe_Images/'):
     ''' Prepare Images and Ingredients for NN
@@ -127,7 +133,7 @@ def clean_text(ingred_list):
                     , 'fourth', 'at', 'broken', 'quart', 'freshly', 'drain' \
                     , 'reserve', 'liquid', 'degree', 'mashed', 'square' \
                     , 'on', 'crosswise', 'strip', 'with', 'tail', 'attached' \
-                    ]
+                    , 'coating', 'according', 'direction', 'end']
     ingred_caption = []
 
     # iterate over recipes
@@ -159,7 +165,6 @@ def clean_text(ingred_list):
             row_final.append(str(item_final))
 
         # row_final.append('#END#')
-        row_final.append('#')
 
         ingred_caption_final.append(row_final)
 
@@ -177,7 +182,7 @@ def create_text_vectorizer(text_list):
         Count vector
     '''
 
-    vocab = set(itertools.chain.from_iterable(text_list))
+    vocab = sorted(set(itertools.chain.from_iterable(text_list)))
 
     corpus = []
     for recipe in text_list:
@@ -189,17 +194,28 @@ def create_text_vectorizer(text_list):
     print 'corpus length: ' + str(len(corpus))
 
     print 'total words: ' + str(len(vocab))
-    word_indices = dict((c, i) for i, c in enumerate(sorted(vocab)))
-    indices_word = dict((i, c) for i, c in enumerate(sorted(vocab)))
+    word_indices = dict((c, i) for i, c in enumerate(vocab))
+    indices_word = dict((i, c) for i, c in enumerate(vocab))
 
     return word_indices, indices_word
 
 def vectorize_text(text_list, word_indices):
+    ''' Vectorize multiple cleaned lists of ingredients '''
     y = np.zeros((len(text_list), len(word_indices)), dtype=np.bool)
-    for i, sentence in enumerate(text_list):
-        for t, word in enumerate(sentence):
+    for i, recipe in enumerate(text_list):
+        for t, word in enumerate(recipe):
             y[i, word_indices[word]] = 1
     return y
+
+def tensorize_text(text_list, word_indices, max_caption_len):
+    y = np.zeros((len(text_list), len(word_indices)), dtype=np.bool)
+    X = np.zeros((len(sentences), max_caption_len, len(chars)), dtype=np.bool)
+
+    for i, recipe in enumerate(text_list):
+        for t, word in enumerate(recipe):
+            X[i, t, word_indices[word]] = 1
+        y[i, t, word_indices[text_list[i+1]]] = 1
+    return X, y
 
 ''' Image Processing '''
 
@@ -241,8 +257,7 @@ def preprocess_imgs(base_path, img_keys):
     pass
 
 def save_processed_imgs_to_disk(base_path='/data/'):
-    '''
-    Run on scraped images to create numpy arrays and VGG net processed data
+    ''' Run on scraped images to create numpy arrays and VGG net processed data
     '''
     df = pd.read_csv(base_path+'recipe_data.csv')
     df.drop('Unnamed: 0', axis=1, inplace=True)
@@ -258,6 +273,11 @@ if __name__ == '__main__':
     base_path = '../'
     df = pd.read_csv(base_path+'data/recipe_data.csv')
     # vectorizer, words = vectorize_text(df['ingred_list'], 1000)
-    words = clean_text(df['ingred_list'])
-    y, indices_word = vectorize_text(words)
+    text_list = clean_text(df['ingred_list'])
+    vect = create_text_vectorizer(text_list)
+    binarizer = MultiLabelBinarizer()
+    vocab = set(itertools.chain.from_iterable(text_list))
+    binarizer = binarizer.fit(vocab)
+    # y, indices_word = vectorize_text(df['clean_text'])
+    # X, y = tensorize_text(words[:1])
     # array, words = vectorize_text(test, 10000)
