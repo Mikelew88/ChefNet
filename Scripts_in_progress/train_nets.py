@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from itertools import izip_longest
 
-from sklearn.metrics import log_loss, f1_score
+from sklearn.metrics import log_loss
 from sklearn.preprocessing import MultiLabelBinarizer
 
 from keras.datasets import cifar10
@@ -55,7 +55,7 @@ def batch_train(train_df, test_df, model, input_shape, word_indices, indices_wor
                 # for i in test_0:
                 #     print indices_word[i]
 
-                loss, accuracy = model.train_on_batch(X_train, y_train)
+                model.train_on_batch(X_train, y_train)
 
                 # accuracy=True)
 
@@ -67,14 +67,12 @@ def batch_train(train_df, test_df, model, input_shape, word_indices, indices_wor
         y_pred = model.predict(X_test)
         print 'Epoch {}'.format(e)
         print 'Mean Validation Log Loss: {}'.format(np.mean(log_loss(y_test,y_pred)))
-        print 'Mean Validation F1 score: {}'.format(np.mean(log_loss(y_test,y_pred)))
-        print '\n \n \n'
+        print '\n \n'
 
     return model, word_indices
 
 def grouper(iterable, n, fillvalue=None):
-    ''' helper function for batching
-    '''
+    ''' helper function for batching '''
     args = [iter(iterable)] * n
     return izip_longest(*args, fillvalue=fillvalue)
 
@@ -84,21 +82,7 @@ def pickle_trained_nn(model, name):
         pickle.dump(model, f)
     pass
 
-
-def train_MLP_net():
-    ''' Train and save a MLP net '''
-    # max_classes=5000
-    input_shape = (3,100,100)
-    df = pd.read_csv('/data/recipe_data.csv')
-    model = build_MLP_net(max_classes, input_shape)
-    trained_model, words = batch_train(df, model, input_shape, max_classes,  img_path='/data/temp_imgs/preprocessed_imgs/')
-
-    pickle_trained_nn(trained_model, 'MLP_temp')
-    np.save('/data/models/words_MLP.npy', words)
-
-    return trained_model, words
-
-def train_VGG_net():
+def train_net(model_function=build_VGG_net, save_name = 'VGG_sigmoid'):
     ''' Train and save a VGG preprocessed net '''
     # max_classes=len(vocab)
     img_path = '/data/temp_imgs/vgg_imgs/'
@@ -113,56 +97,20 @@ def train_VGG_net():
     train_df_expanded = create_df_image_key(train_df, img_path)
     test_df_expanded = create_df_image_key(test_df, img_path)
 
-    binarizer = MultiLabelBinarizer()
-    binarizer = binarizer.fit(df['clean_ingred'])
     train_df, test_df = create_validation_set(df)
 
     word_indices, indices_word = create_text_vectorizer(df['clean_ingred'])
 
     base_path = '/data/'
-    model = build_VGG_net(len(indices_word), input_shape)
-    trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, word_indices, indices_word, epochs=25)
+    model = model_function(len(indices_word), input_shape)
+    trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, word_indices, indices_word, epochs=1)
 
-    pickle_trained_nn(model, 'VGG_sigmoid')
+    pickle_trained_nn(model, save_name)
 
-    with open('/data/models/words_VGG_sigmoid.pkl', 'wb') as f:
-        pickle.dump(indices_word, f)
-
-    return trained_model, indices_word
-
-
-def train_LSTM_net():
-    ''' Train and save a VGG preprocessed RNN '''
-    # max_classes=5000
-    input_shape = (512,3,3)
-
-    df = pd.read_csv('/data/recipe_data.csv')
-
-    clean_text = clean_text(df['ingred_list'])
-    # train_df, test_df = create_validation_set(df)
-
-    word_indices, indices_word = create_text_vectorizer(clean_text)
-
-    base_path = '/data/'
-    model = build_LSTM_net(len(indices_word), input_shape)
-    trained_model = batch_train(df, model, input_shape, word_indices, indices_word, img_path='/data/temp_imgs/vgg_imgs/')
-
-    pickle_trained_nn(model, 'LSTM_sigmoid')
-
-    with open('/data/models/words_LSTM_sigmoid.pkl', 'wb') as f:
+    with open('/data/models/words_'+save_name+'.pkl', 'wb') as f:
         pickle.dump(indices_word, f)
 
     return trained_model, indices_word
 
 if __name__ == '__main__':
-    trained_model, words = train_VGG_net()
-    # trained_model, words = train_MLP_net()
-    # trained_model, word_indices = train_LSTM_net()
-
-
-    # Local test
-    # max_classes=5000
-    # input_shape = (512,7,7)
-    # df = pd.read_csv('../data/recipe_data.csv')
-    # model = build_MLP_net(max_classes, input_shape)
-    # trained_model, words = batch_train(df, model, input_shape, max_classes,  img_path='../images/vgg_imgs/')
+    trained_model, words = train_net(model_function=build_LSTM_net, save_name = 'LSTM_sigmoid')
