@@ -24,7 +24,7 @@ import cPickle as pickle
 from preprocess_data import create_validation_set, create_df_image_key, load_imgs, clean_text, vectorize_text, create_text_vectorizer
 from build_models import build_MLP_net, build_VGG_net, build_LSTM_net
 
-def batch_train(df, model, input_shape, word_indices, img_path, epochs = 1, batch_size = 50):
+def batch_train(df, model, input_shape, word_indices, img_path, epochs = 10, batch_size = 50):
     ''' Since all images do not fit into memory, we must batch process ourselves
     '''
 
@@ -122,8 +122,8 @@ def train_LSTM_net():
 
     pickle_trained_nn(model, 'LSTM_temp')
 
-    with open('/data/models/words_LSTM.txt', 'w') as outfile:
-        json.dumps(indices_word, outfile)
+    with open('/data/models/words_LSTM.pkl', 'wb') as f:
+        pickle.dump(indices_word, f)
 
     return trained_model, indices_word
 

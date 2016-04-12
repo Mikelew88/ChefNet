@@ -126,7 +126,8 @@ def clean_text(ingred_list):
                     , 'blanched', 'beaten', 'thawed', 'lightly', 'light' \
                     , 'fourth', 'at', 'broken', 'quart', 'freshly', 'drain' \
                     , 'reserve', 'liquid', 'degree', 'mashed', 'square' \
-                    , 'on', 'crosswise', 'strip']
+                    , 'on', 'crosswise', 'strip', 'with', 'tail', 'attached' \
+                    ]
     ingred_caption = []
 
     # iterate over recipes

@@ -1,13 +1,20 @@
 import cPickle as pickle
 import numpy as np
 import pandas as pd
+import json
 
 def open_pkl_and_words(model_name):
     ''' Load pickled model and list of words '''
     with open('/data/models/'+model_name+'_temp.pkl', 'r') as f:
         model = pickle.load(f)
-    words = np.load('/data/models/words_'+model_name+'.npy')
-    return model, words
+
+    with open('/data/models/words_LSTM.pkl', 'rb') as fp:
+        word_indices = pickle.load(fp)
+
+    # with open('/data/models/words_'+model_name+'.txt', 'r') as f:
+    # words = json.loads('/data/models/words_'+model_name+'.txt')
+    return model
+    # , words
 
 def predict_img(model, words, id, img_num, img_folder, df):
     ''' Allow user to test model with a specific image'''
@@ -63,5 +70,5 @@ def write_img_caption(img_num):
 if __name__ == '__main__':
     df = pd.read_csv('/data/recipe_data.csv')
 
-    model, words = open_pkl_and_words('LSTM')
-    pred_words, true_y = predict_img(model, words, '8694', '4', 'preprocessed_imgs/', df)
+    model = open_pkl_and_words('LSTM')
+    # pred_words, true_y = predict_img(model, words, '8694', '4', 'preprocessed_imgs/', df)
