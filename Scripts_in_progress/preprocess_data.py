@@ -1,3 +1,7 @@
+import sys
+
+sys.dont_write_bytecode = True
+
 import os
 import re
 import pandas as pd
@@ -11,17 +15,8 @@ from skimage.io import imread_collection, imread
 from skimage.transform import resize
 from itertools import izip_longest
 from train_VGG_net import load_VGG_16, get_activations
-# from scipy.misc import imread
 
 from nltk.stem import WordNetLemmatizer
-
-import sys
-
-sys.dont_write_bytecode = True
-
-# from sklearn.cross_validation import train_test_split
-
-# from pymongo import MongoClient
 
 def prepare_data(df, img_path = 'images/Recipe_Images/'):
     ''' Prepare Images and Ingredients for NN
@@ -89,6 +84,8 @@ def create_df_image_key(df_in, dir_path):
     df_out['file_key'] = [x.split('/')[-1].split('.')[0] for x in df_out['img_path']]
 
     return df_out
+
+''' Text processing '''
 
 def clean_text(ingred_list):
     ''' Clean ingredient text to only keep key words for Vectorizer
@@ -166,9 +163,52 @@ def clean_text(ingred_list):
         ingred_caption_final.append(row_final)
 
     # ingred_for_vectorizer = [', '.join(x) for x in ingred_caption_underscored]
-    vocab = set(itertools.chain.from_iterable(ingred_caption_final))
-    return ingred_caption_final, vocab
 
+    return ingred_caption_final
+
+def create_text_vectorizer(text_list):
+    ''' Convert Ingredients to Count Vectors
+
+    Input:
+        Raw ingredient list as scraped
+
+    Output:
+        Count vector
+    '''
+
+    vocab = set(itertools.chain.from_iterable(text_list))
+
+    corpus = []
+    for recipe in text_list:
+        for word in recipe:
+            corpus.append(word)
+
+    # text = ' '.join(text_list)
+
+    print 'corpus length: ' + str(len(corpus))
+
+    print 'total words: ' + str(len(vocab))
+    word_indices = dict((c, i) for i, c in enumerate(sorted(vocab)))
+    indices_word = dict((i, c) for i, c in enumerate(sorted(vocab)))
+
+    return word_indices, indices_word
+
+def vectorize_text(text_list, word_indices):
+    y = np.zeros((len(text_list), len(word_indices)), dtype=np.bool)
+    for i, sentence in enumerate(text_list):
+        for t, word in enumerate(sentence):
+            y[i, word_indices[word]] = 1
+    return y
+
+''' Image Processing '''
+
+def load_imgs(img_arrays, input_shape):
+    x, y, z = input_shape
+    X = np.empty((len(img_arrays),x,y,z))
+    for i, img in enumerate(img_arrays):
+        X[i,:,:,:] = np.load(img)
+
+    return X
 
 def preprocess_imgs(base_path, img_keys):
     ''' Save .jpgs arrays and VGG net decomposed arrays
@@ -199,52 +239,6 @@ def preprocess_imgs(base_path, img_keys):
         print 'Save VGG array: {}'.format(img_key)
     pass
 
-def vectorize_text(text_list, vocab):
-    ''' Convert Ingredients to Count Vectors
-
-    Input:
-        Raw ingredient list as scraped
-
-    Output:
-        Count vector
-    '''
-
-    corpus = []
-    for recipe in text_list:
-        for word in recipe:
-            corpus.append(word)
-
-    # text = ' '.join(text_list)
-
-    print 'corpus length: ' + str(len(corpus))
-
-    print 'total words: ' + str(len(vocab))
-    word_indices = dict((c, i) for i, c in enumerate(sorted(vocab)))
-    indices_word = dict((i, c) for i, c in enumerate(sorted(vocab)))
-
-    print 'Vectorization...'
-    y = np.zeros((len(text_list), len(vocab)), dtype=np.bool)
-    for i, sentence in enumerate(text_list):
-        for t, word in enumerate(sentence):
-            y[i, word_indices[word]] = 1
-
-
-    # vectorizer=CountVectorizer(max_features=max_classes)
-    # vectorizer.fit(clean_text)
-    # # trans_vect = vectorizer.transform(ingred_for_vectorizer)
-    #
-    # # array = trans_vect.toarray()
-    # words = vectorizer.get_feature_names()
-    return y, indices_word
-
-def load_imgs(img_arrays, input_shape):
-    x, y, z = input_shape
-    X = np.empty((len(img_arrays),x,y,z))
-    for i, img in enumerate(img_arrays):
-        X[i,:,:,:] = np.load(img)
-
-    return X
-
 def save_processed_imgs_to_disk(base_path='/data/'):
     '''
     Run on scraped images to create numpy arrays and VGG net processed data
@@ -263,6 +257,6 @@ if __name__ == '__main__':
     base_path = '../'
     df = pd.read_csv(base_path+'data/recipe_data.csv')
     # vectorizer, words = vectorize_text(df['ingred_list'], 1000)
-    words, vocab = clean_text(df['ingred_list'])
-    y, indices_word = vectorize_text(words, vocab)
+    words = clean_text(df['ingred_list'])
+    y, indices_word = vectorize_text(words)
     # array, words = vectorize_text(test, 10000)

@@ -1,17 +1,15 @@
 from keras.datasets import cifar10
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Activation, Flatten
+from keras.layers.core import Dense, Dropout, Activation, Flatten, Reshape
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.layers.recurrent import LSTM, SimpleRNN
 from keras.optimizers import SGD
 from keras.utils import np_utils
 
-def build_MLP_net(max_classes, input_shape):
+def build_MLP_net(nb_classes, input_shape):
     ''' Create a preliminary Keras MLP model
     '''
-
-    nb_classes = max_classes
 
     model = Sequential()
 
@@ -45,11 +43,9 @@ def build_MLP_net(max_classes, input_shape):
 
     return model
 
-def build_VGG_net(max_classes, input_shape):
+def build_VGG_net(nb_classes, input_shape):
     ''' Create a Keras model for images preprocessed with VGG net
     '''
-
-    nb_classes = max_classes
 
     model = Sequential()
 
@@ -74,14 +70,15 @@ def build_VGG_net(max_classes, input_shape):
 
     return model
 
-def build_LSTM_net(max_classes, input_shape):
+def build_LSTM_net(nb_classes, input_shape):
     ''' Train and save a LSTM net
     '''
 
     model = Sequential()
 
-    model.add(Convolution2D(32, 3, 3, border_mode='same',
+    model.add(Convolution2D(512, 3, 3, border_mode='same',
                         input_shape=input_shape))
+    model.add(Reshape((512, 9)))
     model.add(LSTM(512, return_sequences=True))
     model.add(Dropout(0.2))
     model.add(LSTM(512, return_sequences=False))
@@ -91,6 +88,6 @@ def build_LSTM_net(max_classes, input_shape):
 
     model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
 
-    print 'We have a model!'
+    print 'We have an LSTM model!'
 
     return model

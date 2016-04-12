@@ -1,4 +1,4 @@
-https://www.youtube.com/watch?v=yCC09vCHzF8import cPickle as pickle
+import cPickle as pickle
 import numpy as np
 import pandas as pd
 
@@ -28,6 +28,37 @@ def predict_img(model, words, id, img_num, img_folder, df):
         print item
 
     return pred_words, true_y
+
+def write_img_caption(img_num):
+    for diversity in [0.2, 0.5, 1.0, 1.2]:
+        print ''
+        print '----- diversity: ' + str(diversity)
+
+        generated = ''
+        sentence = text[start_index: start_index + maxlen]
+        generated += sentence
+        print('----- Generating with seed: "' + img_num + '"')
+        sys.stdout.write(generated)
+
+        for i in range(400):
+            x = np.zeros((1, maxlen, len(words)))
+            for t, word in enumerate(sentence):
+                x[0, t, word_indices[word]] = 1.
+
+            preds = model.predict(x, verbose=0)[0]
+            next_index = sample(preds, diversity)
+            next_word = indices_word[next_index]
+
+            if next_word == '#':
+                break
+
+            generated += next_word
+            sentence = sentence[1:] + next_word
+
+            sys.stdout.write(next_word)
+            sys.stdout.flush()
+        print()
+
 
 if __name__ == '__main__':
     df = pd.read_csv('/data/recipe_data.csv')
