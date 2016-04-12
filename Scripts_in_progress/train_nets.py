@@ -1,6 +1,7 @@
 import sys
 
 sys.dont_write_bytecode = True
+sys.setrecursionlimit(999999999)
 
 import json
 
@@ -62,7 +63,7 @@ def batch_train(df, model, input_shape, word_indices, img_path, epochs = 1, batc
         print 'Mean Validation Log Loss: {}'.format(np.mean(log_loss(y_test,y_pred)))
         print '\n \n \n'
 
-    return model, words
+    return model, word_indices
 
 def grouper(iterable, n, fillvalue=None):
     ''' helper function for batching
@@ -83,12 +84,12 @@ def train_VGG_net():
     base_path = '/data/'
     df = pd.read_csv(base_path+'recipe_data.csv')
     model = build_VGG_net(max_classes, input_shape)
-    trained_model, words = batch_train(df, model, input_shape, max_classes,  img_path='/data/temp_imgs/vgg_imgs/')
+    trained_model, word_indices = batch_train(df, model, input_shape, max_classes,  img_path='/data/temp_imgs/vgg_imgs/')
 
     pickle_trained_nn(model, 'MLP_VGG_temp')
-    np.save('/data/models/words_MLP_VGG.npy', words)
+    np.save('/data/models/words_MLP_VGG.npy', word_indices)
 
-    return trained_model, words
+    return trained_model, word_indices
 
 def train_MLP_net():
     ''' Train and save a MLP net '''
@@ -129,7 +130,7 @@ def train_LSTM_net():
 if __name__ == '__main__':
     # trained_model, words = train_VGG_net()
     # trained_model, words = train_MLP_net()
-    trained_model, words = train_LSTM_net()
+    trained_model, word_indices = train_LSTM_net()
 
 
     # Local test

@@ -63,5 +63,5 @@ def write_img_caption(img_num):
 if __name__ == '__main__':
     df = pd.read_csv('/data/recipe_data.csv')
 
-    model, words = open_pkl_and_words('MLP')
+    model, words = open_pkl_and_words('LSTM')
     pred_words, true_y = predict_img(model, words, '8694', '4', 'preprocessed_imgs/', df)
