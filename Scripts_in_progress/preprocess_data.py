@@ -10,6 +10,8 @@ import operator
 import itertools
 import indicoio
 
+from collections import defaultdict
+
 from itertools import izip_longest
 from itertools import izip_longest
 
@@ -274,9 +276,48 @@ def clean_text(ingred_list, max_ingred_len=3):
                     , 'pale', 'pad', 'pacific', 'pace', 'nacho', 'live' \
                     , 'headless', 'heart', 'flake', 'flakeystyle', 'fatfree' \
                     , 'dr', 'creolstyle', 'creamstyle', 'creamystyle', 'cool' \
-                    , 'bob', 'peter', 'lugar']
+                    , 'bob', 'peter', 'lugar', 'tube', 'superfine', 'vine' \
+                    , 'snow', 'tyson', 'type', 'virginia', 'regularsize' \
+                    , 'shake', 'rough', 'rub', 'quickrise', 'rack', 'rim' \
+                    , 'ritz', 'saltine', 'rapit', 'request', 'rest' \
+                    , 'reynolds', 'picnic', 'pat', 'open', 'niblet' \
+                    , 'mediumhot', 'mediumlarge', 'mediumsize' \
+                    , 'mediumspice', 'mediumthick', 'mediumgrain', 'maxwell' \
+                    , 'matchstickcut', 'meatless', 'london', 'longhorn' \
+                    , 'louisianastyle', 'lower', 'lowersodium', 'lowfat' \
+                    , 'lowsodium', 'lump', 'lowmoisture', 'kiss', 'heat' \
+                    , 'hellmanns', 'husk', 'hug', 'indian', 'individual' \
+                    , 'instruction', 'irish', 'joe', 'grinder', 'grill' \
+                    , 'haas', 'ha', 'green', 'friendship', 'frysize' \
+                    , 'fresno', 'greek', 'greekstyle', 'ghirardelli' \
+                    , 'gimme', 'farmer', 'flakystyle', 'flank', 'florida' \
+                    , 'fell', 'dinner', 'dinosaur', 'disco', 'dole' \
+                    , 'domestic', 'deepfat', 'deepdish', 'decorator' \
+                    , 'curlystyle', 'crumble', 'creole', 'cardboard' \
+                    , 'caribbean', 'cajun', 'cajunstyle', 'brazil', 'au' \
+                    , 'alphabet', 'alternate', 'alum', 'asianstyle' \
+                    , 'assemble', 'backbone', 'basket', 'blood', 'xinches' \
+                    , 'st', 'sour', 'soul', 'skirt', 'sleeve', 'slender' \
+                    , 'silk', 'single', 'snip', 'snack', 'smokie' \
+                    , 'rome', 'root', 'rare', 'rock', 'rapid', 'rapidrise' \
+                    , 'rainbow', 'pour', 'porter', 'pod', 'basmati', 'batter' \
+                    , 'bavarianstyle', 'beau', 'belgian', 'bowl', 'bow' \
+                    , 'breakfast', 'breakstone', 'brick', 'spear', 'spread' \
+                    , 'solidpack', 'soften', 'snack', 'southwest', 'southern' \
+                    , 'southernstyle', 'soyginger', 'splash', 'sport' \
+                    , 'spread', 'sponge', 'squeeze', 'ahi', 'al', 'fresco' \
+                    , 'amish', 'cesar', 'crisp', 'curd', 'crumb', 'crown' \
+                    , 'diet', 'diamond', 'diagonal', 'devil', 'dutchprocess' \
+                    , 'earl', 'eat', 'edible', 'eigth', 'emerils', 'equal' \
+                    , 'england', 'excess', 'extralong', 'extravirgin' \
+                    , 'expeel', 'farmhousestyle', 'fiddlehead', 'fiesta' \
+                    , 'fiestastyle', 'fin', 'finger', 'fire', 'food', 'foo' \
+                    , 'fork', 'four', 'one', 'two', 'three', 'five', 'six' \
+                    , 'seven']
 
-    exclude_ingredients = ['cool', 'collard', 'al fresco', 'green', 'pink', 'black']
+    exclude_ingredients = ['cool', 'collard', 'al fresco', 'green', 'pink' \
+    , 'black', 'yellow', 'great northern', 'greek', 'creole', 'blue', 'bell' \
+    , 'english']
     ingred_caption = []
     exclude_ending_1 = ['y']
     exclude_ending_2 = ['ly', 'ed']
@@ -300,7 +341,8 @@ def clean_text(ingred_list, max_ingred_len=3):
                 and word[-3:] not in exclude_ending_3:
                     line_str.append(word)
                     i+=1
-            if line_str != [] and str(line_str) not in exclude_ingredients:
+
+            if line_str != [] and line_str[0] not in exclude_ingredients:
                 line_final.append(line_str)
         ingred_caption.append(line_final)
 
@@ -340,27 +382,40 @@ def create_text_vectorizer(text_list):
 
     vocab = sorted(set(itertools.chain.from_iterable(text_list)))
 
+    indicoio_keywords = indicoio.keywords(vocab, version=2)
+    ingred_caption_keywords = []
+    word_keyword = defaultdict(str)
+
+    for i, v in zip(indicoio_keywords, vocab):
+        try:
+            keyword = str(max(i.iteritems(), key=operator.itemgetter(1))[0])
+            word_keyword[v] = keyword
+            ingred_caption_keywords.append(keyword)
+        except:
+            pass
+
+    new_vocab = sorted(set(ingred_caption_keywords))
     corpus = []
     for recipe in text_list:
         for word in recipe:
             corpus.append(word)
 
-    # text = ' '.join(text_list)
-
     print 'corpus length: ' + str(len(corpus))
 
-    print 'total words: ' + str(len(vocab))
-    word_indices = dict((c, i) for i, c in enumerate(vocab))
-    indices_word = dict((i, c) for i, c in enumerate(vocab))
+    print 'total words: ' + str(len(new_vocab))
+    word_indices = dict((c, i) for i, c in enumerate(new_vocab))
+    indices_word = dict((i, c) for i, c in enumerate(new_vocab))
 
-    return word_indices, indices_word
+    return word_indices, indices_word, word_keyword
 
-def vectorize_text(text_list, word_indices):
+def vectorize_text(text_list, word_indices, word_keyword):
     ''' Vectorize multiple cleaned lists of ingredients '''
     y = np.zeros((len(text_list), len(word_indices)), dtype=np.bool)
     for i, recipe in enumerate(text_list):
         for t, word in enumerate(recipe):
-            y[i, word_indices[word]] = 1
+            keyword = word_keyword[word]
+            if keyword != '':
+                y[i, word_indices[keyword]] = 1
     return y
 
 def tensorize_text(text_list, word_indices, max_caption_len):
@@ -430,19 +485,21 @@ if __name__ == '__main__':
     df = pd.read_csv(base_path+'data/recipe_data.csv')
     # vectorizer, words = vectorize_text(df['ingred_list'], 1000)
     text_list = clean_text(df['ingred_list'])
-    vocab = sorted(set(itertools.chain.from_iterable(text_list)))
-    indicoio_keywords = indicoio.keywords(vocab, version=2)
-    ingred_caption_keywords = []
-    for i in indicoio_keywords:
-        try:
-            keyword = str(max(i.iteritems(), key=operator.itemgetter(1))[0])
-            ingred_caption_keywords.append(keyword)
-        except:
-            pass
 
-    new_vocab = sorted(set(ingred_caption_keywords))
-    print new_vocab
-    print len(new_vocab)
+    word_indices, indices_word, word_keyword = create_text_vectorizer(text_list)
+    # vocab = sorted(set(itertools.chain.from_iterable(text_list)))
+    # indicoio_keywords = indicoio.keywords(vocab, version=2)
+    # ingred_caption_keywords = []
+    # for i in indicoio_keywords:
+    #     try:
+    #         keyword = str(max(i.iteritems(), key=operator.itemgetter(1))[0])
+    #         ingred_caption_keywords.append(keyword)
+    #     except:
+    #         pass
+    #
+    # new_vocab = sorted(set(ingred_caption_keywords))
+    # print new_vocab
+    # print len(new_vocab)
 
     # y, indices_word = vectorize_text(df['clean_text'])
     # X, y = tensorize_text(words[:1])

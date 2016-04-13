@@ -25,7 +25,7 @@ import cPickle as pickle
 from preprocess_data import create_validation_set, create_df_image_key, load_imgs, clean_text, create_text_vectorizer, vectorize_text
 from build_models import build_MLP_net, build_VGG_net, build_LSTM_net
 
-def batch_train(train_df, test_df, model, input_shape, word_indices, indices_word, epochs = 10, batch_size = 50):
+def batch_train(train_df, test_df, model, input_shape, word_indices, indices_word, word_keyword, epochs = 1, batch_size = 50):
     ''' Since all images do not fit into memory, we must batch process ourselves
     '''
 
@@ -49,20 +49,20 @@ def batch_train(train_df, test_df, model, input_shape, word_indices, indices_wor
                 batch = np.array(batch)
                 X_train = load_imgs(batch[:,0], input_shape)
 
-                y_train = vectorize_text(batch[:,1], word_indices)
+                y_train = vectorize_text(batch[:,1], word_indices, word_keyword)
                 test_0 = np.where(y_train[0,:]==True)[0]
                 test_where = np.where(y_train == True)[1]
                 # for i in test_0:
                 #     print indices_word[i]
 
+                # accuracy, loss =
                 model.train_on_batch(X_train, y_train)
-
-                # accuracy=True)
+                # , accuracy=True)
 
                 # print 'Batch {} \n Accuracy: {} \n Loss: {}'.format(i, accuracy, loss)
 
         X_test = load_imgs(np.array(test_df['img_path']), input_shape)
-        y_test = vectorize_text(np.array(test_df['clean_ingred']), word_indices)
+        y_test = vectorize_text(np.array(test_df['clean_ingred']), word_indices, word_keyword)
 
         y_pred = model.predict(X_test)
         print 'Epoch {}'.format(e)
@@ -82,7 +82,7 @@ def pickle_trained_nn(model, name):
         pickle.dump(model, f)
     pass
 
-def train_net(model_function=build_VGG_net, save_name = 'VGG_sigmoid_bigger'):
+def train_net(model_function=build_VGG_net, save_name = 'VGG_sigmoid'):
     ''' Train and save a VGG preprocessed net '''
     # max_classes=len(vocab)
     img_path = '/data/temp_imgs_bigger/vgg_imgs/'
@@ -99,19 +99,22 @@ def train_net(model_function=build_VGG_net, save_name = 'VGG_sigmoid_bigger'):
 
     train_df, test_df = create_validation_set(df)
 
-    word_indices, indices_word = create_text_vectorizer(df['clean_ingred'])
+    word_indices, indices_word, word_keyword = create_text_vectorizer(df['clean_ingred'])
 
     base_path = '/data/'
     model = model_function(len(indices_word), input_shape)
-    trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, word_indices, indices_word, epochs=100)
+    trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, word_indices, indices_word, word_keyword, epochs=10)
 
     pickle_trained_nn(model, save_name)
 
     with open('/data/models/words_'+save_name+'.pkl', 'wb') as f:
         pickle.dump(indices_word, f)
 
+    with open('/data/models/word_keyword_'+save_name+'.pkl', 'wb') as f:
+        pickle.dump(word_keyword, f)
+
     return trained_model, indices_word
 
 if __name__ == '__main__':
-    # trained_model, words = train_net(model_function=build_LSTM_net, save_name = 'LSTM_sigmoid')
+    # trained_model, words = train_net(model_function=build_LSTM_net, save_name = 'LSTM_sigmoid_bigger')
     trained_model, words = train_net()

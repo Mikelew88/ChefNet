@@ -11,7 +11,7 @@ def open_pkl_and_words(model_name):
     with open('/data/models/'+model_name+'.pkl', 'r') as f:
         model = pickle.load(f)
 
-    with open('/data/models/words_LSTM.pkl', 'rb') as fp:
+    with open('/data/models/words_'+model_name+'.pkl', 'rb') as fp:
         indices_word = pickle.load(fp)
 
     # with open('/data/models/words_'+model_name+'.txt', 'r') as f:
@@ -24,7 +24,7 @@ def predict_img(model, words, id, img_num, img_folder, df):
     img_arr = np.load('/data/'+img_folder+id+'_'+img_num+'.npy')
 
     pred = np.array(model.predict(img_arr))
-    pred_words = words[pred[0,:] > 0.01]
+    pred_words = words[pred[0,:] > 0.5]
 
     print 'Net thinks there are these ingredinets: '
     for item in pred_words:
