@@ -82,10 +82,10 @@ def pickle_trained_nn(model, name):
         pickle.dump(model, f)
     pass
 
-def train_net(model_function=build_VGG_net, save_name = 'VGG_sigmoid'):
+def train_net(model_function=build_VGG_net, save_name = 'VGG_sigmoid_bigger'):
     ''' Train and save a VGG preprocessed net '''
     # max_classes=len(vocab)
-    img_path = '/data/temp_imgs/vgg_imgs/'
+    img_path = '/data/temp_imgs_bigger/vgg_imgs/'
     input_shape = (512,3,3)
 
     df = pd.read_csv('/data/recipe_data.csv')
@@ -103,7 +103,7 @@ def train_net(model_function=build_VGG_net, save_name = 'VGG_sigmoid'):
 
     base_path = '/data/'
     model = model_function(len(indices_word), input_shape)
-    trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, word_indices, indices_word, epochs=1)
+    trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, word_indices, indices_word, epochs=100)
 
     pickle_trained_nn(model, save_name)
 
@@ -113,4 +113,5 @@ def train_net(model_function=build_VGG_net, save_name = 'VGG_sigmoid'):
     return trained_model, indices_word
 
 if __name__ == '__main__':
-    trained_model, words = train_net(model_function=build_LSTM_net, save_name = 'LSTM_sigmoid')
+    # trained_model, words = train_net(model_function=build_LSTM_net, save_name = 'LSTM_sigmoid')
+    trained_model, words = train_net()

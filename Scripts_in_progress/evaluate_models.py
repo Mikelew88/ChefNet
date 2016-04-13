@@ -100,5 +100,5 @@ def write_img_caption(model, indices_word, id, img_num, img_folder, df):
 if __name__ == '__main__':
     df = pd.read_csv('/data/recipe_data.csv')
 
-    model, indices_word = open_pkl_and_words('VGG_sigmoid')
-    pred_words = write_img_caption(model, indices_word, '8887', '0', 'vgg_imgs/', df)
+    model, indices_word = open_pkl_and_words('VGG_sigmoid_bigger')
+    pred_words = write_img_caption(model, indices_word, '6788', '0', 'vgg_imgs/', df)
