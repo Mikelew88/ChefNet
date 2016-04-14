@@ -14,10 +14,12 @@ from sklearn.metrics import log_loss
 import cPickle as pickle
 
 from preprocess_text_el import clean_text_basic, vectorize_text
+from preprocess_data import create_validation_set, create_df_image_key, load_imgs
+
 
 from build_models import build_MLP_net, build_VGG_net, build_LSTM_net
 
-def batch_train(train_df, test_df, model, input_shape, word_indices, indices_word, word_keyword, epochs = 1, batch_size = 50):
+def batch_train(train_df, test_df, model, input_shape, vocab, epochs = 1, batch_size = 50):
     ''' Since all images do not fit into memory, we must batch process ourselves
     '''
 
@@ -41,9 +43,11 @@ def batch_train(train_df, test_df, model, input_shape, word_indices, indices_wor
                 test_0 = np.where(y_train[0,:]==True)[0]
                 test_where = np.where(y_train == True)[1]
 
-                accuracy, loss = model.train_on_batch(X_train, y_train, accuracy=True)
+                # accuracy, loss =
+                model.train_on_batch(X_train, y_train)
+                # , accuracy=True)
 
-                print 'Batch {} \n Accuracy: {} \n Loss: {}'.format(i, accuracy, loss)
+                # print 'Batch {} \n Accuracy: {} \n Loss: {}'.format(i, accuracy, loss)
 
         X_test = load_imgs(np.array(test_df['img_path']), input_shape)
         y_test = vectorize_text(np.array(test_df['clean_ingred']), vocab)
@@ -76,7 +80,7 @@ def train_net(model_function=build_VGG_net, save_name = 'VGG_sigmoid_el'):
 
     df['clean_ingred'] = clean_text_basic(df['ingred_list'])
 
-    with open('../data/el_keywords.pkl', 'r') as fp:
+    with open('/data/el_keywords.pkl', 'r') as fp:
         vocab = pickle.load(fp)
 
     train_df, test_df = create_validation_set(df)
@@ -91,12 +95,6 @@ def train_net(model_function=build_VGG_net, save_name = 'VGG_sigmoid_el'):
     trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, vocab, epochs=10)
 
     pickle_trained_nn(model, save_name)
-
-    with open('/data/models/words_'+save_name+'.pkl', 'wb') as f:
-        pickle.dump(indices_word, f)
-
-    with open('/data/models/word_keyword_'+save_name+'.pkl', 'wb') as f:
-        pickle.dump(word_keyword, f)
 
     return trained_model, indices_word
 

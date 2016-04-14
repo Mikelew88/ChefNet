@@ -68,7 +68,7 @@ def clean_text_basic(ingred_list):
 def vectorize_text(clean_text, vocab):
     ''' Vectorize multiple cleaned lists of ingredients '''
     y = np.zeros((len(clean_text), len(vocab)), dtype=np.bool)
-    for i, text in enumerate(text_list):
+    for i, text in enumerate(clean_text):
         for t, voc in enumerate(vocab):
             if voc in text:
                 y[i, t] = 1
