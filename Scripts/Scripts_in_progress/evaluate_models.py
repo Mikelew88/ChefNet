@@ -28,7 +28,7 @@ def write_img_caption(model, vocab, img_arr, df, img_id=None, threshold=.5):
     ''' predict words in an img '''
     preds = model.predict(img_arr, verbose=0)[0]
 
-    if not img_id:
+    if img_id:
         print 'Recipe Number: ' + str(img_id)
 
     pred_index = np.where(preds > threshold)[0]
@@ -42,14 +42,17 @@ def write_img_caption(model, vocab, img_arr, df, img_id=None, threshold=.5):
         if generated == '':
             generated += next_word
             sys.stdout.write(next_word)
+            sys.stdout.write(' (' + str(preds[next_index]) + ')')
+
         else:
             generated += ', '+next_word
             sys.stdout.write(', ')
             sys.stdout.write(next_word)
+            sys.stdout.write(' (' + str(preds[next_index]) + ')')
 
         sys.stdout.flush()
 
-    if not img_id:
+    if img_id:
         print '\n'
 
         id_int = int(img_id)
@@ -96,5 +99,7 @@ if __name__ == '__main__':
     img_array, img_id = load_preprocessed(8452, 4, 'vgg_imgs/')
     write_img_caption(model, vocab, img_array, df, img_id = img_id, threshold=.3)
 
-    # img_array = load_jpg('/data/Recipe_Images/237315_0.jpg', (250,250))
-    # write_img_caption(model, vocab, img_array, df, threshold=.3)
+    print '\n'
+
+    img_array = load_jpg('/data/Recipe_Images/237315_0.jpg', (100,100))
+    write_img_caption(model, vocab, img_array, df, threshold=.3)
