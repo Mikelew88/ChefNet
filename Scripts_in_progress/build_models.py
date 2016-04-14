@@ -33,11 +33,11 @@ def build_MLP_net(nb_classes, input_shape):
     model.add(Activation('relu'))
     model.add(Dropout(0.5))
     model.add(Dense(nb_classes))
-    model.add(Activation('softmax'))
+    model.add(Activation('sigmoid'))
 
     # train the model using SGD + momentum
-    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-    model.compile(loss='categorical_crossentropy', optimizer=sgd)
+    # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    model.compile(loss='binary_crossentropy', optimizer=Adam())
 
     print 'We have a model!'
 
@@ -49,7 +49,7 @@ def build_VGG_net(nb_classes, input_shape):
 
     model = Sequential()
 
-    model.add(Convolution2D(32, 3, 3, border_mode='same',
+    model.add(Convolution2D(512, 3, 3, border_mode='same',
                         input_shape=input_shape))
     # model.add(Activation('relu'))
     # model.add(Convolution2D(32, 3, 3))
@@ -57,9 +57,9 @@ def build_VGG_net(nb_classes, input_shape):
     model.add(Dropout(0.25))
 
     model.add(Flatten())
-    model.add(Dense(512))
+    model.add(Dense(1000))
     model.add(Activation('relu'))
-    model.add(Dense(512))
+    model.add(Dense(1000))
     model.add(Activation('relu'))
     model.add(Dropout(0.25))
     model.add(Dense(nb_classes))

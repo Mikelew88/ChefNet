@@ -61,8 +61,6 @@ def load_VGG_16(img_size, weights_path='../weights/vgg16_weights.h5'):
     model.add(Convolution2D(512, 3, 3, activation='relu', name='conv5_3'))
     model.add(MaxPooling2D((2, 2), strides=(2, 2)))
 
-
-
     f = h5py.File(weights_path)
     for k in range(f.attrs['nb_layers']):
         if k >= len(model.layers):

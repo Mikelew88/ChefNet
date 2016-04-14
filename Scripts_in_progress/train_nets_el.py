@@ -19,7 +19,7 @@ from preprocess_data import create_validation_set, create_df_image_key, load_img
 
 from build_models import build_MLP_net, build_VGG_net, build_LSTM_net
 
-def batch_train(train_df, test_df, model, input_shape, vocab, epochs = 10, batch_size = 50):
+def batch_train(train_df, test_df, model, input_shape, vocab, epochs = 10, batch_size = 50, print_loss=False):
     ''' Since all images do not fit into memory, we must batch process ourselves
     '''
 
@@ -43,11 +43,11 @@ def batch_train(train_df, test_df, model, input_shape, vocab, epochs = 10, batch
                 test_0 = np.where(y_train[0,:]==True)[0]
                 test_where = np.where(y_train == True)[1]
 
-                # accuracy, loss =
-                model.train_on_batch(X_train, y_train)
-                # , accuracy=True)
-
-                # print 'Batch {} \n Accuracy: {} \n Loss: {}'.format(i, accuracy, loss)
+                if print_loss:
+                    accuracy, loss = model.train_on_batch(X_train, y_train, accuracy=True)
+                    print 'Batch {} \n Accuracy: {} \n Loss: {}'.format(i, accuracy, loss)
+                else:
+                    model.train_on_batch(X_train, y_train)
 
         X_test = load_imgs(np.array(test_df['img_path']), input_shape)
         y_test = vectorize_text(np.array(test_df['clean_ingred']), vocab)
@@ -70,11 +70,19 @@ def pickle_trained_nn(model, name):
         pickle.dump(model, f)
     pass
 
-def train_net(model_function=build_VGG_net, save_name = 'VGG_small_el'):
-    ''' Train and save a VGG preprocessed net '''
-    # max_classes=len(vocab)
-    img_path = '/data/temp_imgs_bigger/vgg_imgs/'
-    input_shape = (512,3,3)
+def save_nn(model, name):
+    # save as JSON
+    json_string = model.to_json()
+    open('/data/models/'+name+'_architecture.json', 'w').write(json_string)
+
+    # model reconstruction from JSON: from keras.models import model_from_json model = model_from_json(json_string)
+
+    model.save_weights('/data/models/'+name+'_weights.h5')
+
+
+
+def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/temp_imgs_bigger/vgg_imgs/', input_shape=(512,3,3)):
+    ''' Train and save NN '''
 
     df = pd.read_csv('/data/recipe_data.csv')
 
@@ -88,16 +96,25 @@ def train_net(model_function=build_VGG_net, save_name = 'VGG_small_el'):
     train_df_expanded = create_df_image_key(train_df, img_path)
     test_df_expanded = create_df_image_key(test_df, img_path)
 
-    train_df, test_df = create_validation_set(df)
-
     base_path = '/data/'
+
+    print 'Loading data... '
+    X_train = load_imgs(train_df_expanded['img_path'], input_shape)
+    y_train = vectorize_text(train_df_expanded['clean_ingred'], vocab)
+
+    X_test = load_imgs(test_df_expanded['img_path'], input_shape)
+    y_test = vectorize_text(test_df_expanded['clean_ingred'], vocab)
+
     model = model_function(len(vocab), input_shape)
-    trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, vocab, epochs=10, batch_size=64)
+    # trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, vocab, epochs=10, batch_size=64)
 
-    pickle_trained_nn(model, save_name)
+    model.fit(X_train, y_train, nb_epoch=10, validation_data = (X_test, y_test))
 
-    return trained_model, vocab
+    save_nn(model, save_name)
+    print save_name + ' has been saved'
+
+    return model, vocab
 
 if __name__ == '__main__':
-    # trained_model, words = train_net(model_function=build_LSTM_net, save_name = 'LSTM_sigmoid_bigger')
-    trained_model, vocab = train_net()
+    trained_model, words = train_net(model_function=build_MLP_net, save_name = 'MLP_non_batch', img_path = '/data/temp_imgs_bigger/preprocessed_imgs/', input_shape = (3,100,100))
+    # trained_model, vocab = train_net(save_name='VGG_non_batch')
