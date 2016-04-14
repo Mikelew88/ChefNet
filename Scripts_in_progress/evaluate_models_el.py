@@ -49,7 +49,7 @@ def write_img_caption(model, indices_word, id, img_num, img_folder, df):
     true_y = df.query('id == @id_int')
     print 'The dish is called {}'.format(true_y['item_name'].values)
     print 'These are the true ingredients: '
-    for item in clean_text(true_y['ingred_list']):
+    for item in true_y['ingred_list']:
         print item
 
     return preds

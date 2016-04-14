@@ -74,12 +74,27 @@ def vectorize_text(clean_text, vocab):
                 y[i, t] = 1
     return y
 
+def create_small_vocab(y, vocab):
+    ingred_counts = np.sum(y, axis=0)
+
+    small_vocab = []
+    for i, vocab in zip (ingred_counts, vocab):
+        if i > 100 and vocab:
+            small_vocab.append(vocab)
+
+    with open('/data/el_small_vocab.pkl', 'w') as f:
+        pickle.dump(small_vocab, f)
+        
+    return small_vocab
+
 if __name__ == '__main__':
 
-    with open('../data/el_keywords.pkl', 'r') as fp:
+    with open('/data/el_vocab_4_14.pkl', 'r') as fp:
         vocab = pickle.load(fp)
 
-    df = pd.read_csv('../data/recipe_data.csv')
+    df = pd.read_csv('/data/recipe_data.csv')
     # vectorizer, words = vectorize_text(df['ingred_list'], 1000)
     text_list = clean_text_basic(df['ingred_list'])
     y = vectorize_text(text_list, vocab)
+
+    small_vocab = create_small_vocab(y, vocab)

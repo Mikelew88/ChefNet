@@ -51,15 +51,17 @@ def build_VGG_net(nb_classes, input_shape):
 
     model.add(Convolution2D(32, 3, 3, border_mode='same',
                         input_shape=input_shape))
-    model.add(Activation('relu'))
-    model.add(Convolution2D(32, 3, 3))
+    # model.add(Activation('relu'))
+    # model.add(Convolution2D(32, 3, 3))
     model.add(Activation('relu'))
     model.add(Dropout(0.25))
 
     model.add(Flatten())
     model.add(Dense(512))
     model.add(Activation('relu'))
-    model.add(Dropout(0.5))
+    model.add(Dense(512))
+    model.add(Activation('relu'))
+    model.add(Dropout(0.25))
     model.add(Dense(nb_classes))
     model.add(Activation('sigmoid'))
 
@@ -86,8 +88,8 @@ def build_LSTM_net(nb_classes, input_shape):
     model.add(Dense(nb_classes))
     model.add(Activation('sigmoid'))
 
-    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-    model.compile(loss='binary_crossentropy', optimizer=sgd)
+    # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    model.compile(loss='binary_crossentropy', optimizer=Adam())
 
     print 'We have a LSTM model!'
 

@@ -19,7 +19,7 @@ from preprocess_data import create_validation_set, create_df_image_key, load_img
 
 from build_models import build_MLP_net, build_VGG_net, build_LSTM_net
 
-def batch_train(train_df, test_df, model, input_shape, vocab, epochs = 1, batch_size = 50):
+def batch_train(train_df, test_df, model, input_shape, vocab, epochs = 10, batch_size = 50):
     ''' Since all images do not fit into memory, we must batch process ourselves
     '''
 
@@ -57,7 +57,7 @@ def batch_train(train_df, test_df, model, input_shape, vocab, epochs = 1, batch_
         print 'Mean Validation Log Loss: {}'.format(np.mean(log_loss(y_test,y_pred)))
         print '\n \n'
 
-    return model, word_indices
+    return model, vocab
 
 def grouper(iterable, n, fillvalue=None):
     ''' helper function for batching '''
@@ -70,7 +70,7 @@ def pickle_trained_nn(model, name):
         pickle.dump(model, f)
     pass
 
-def train_net(model_function=build_VGG_net, save_name = 'VGG_sigmoid_el'):
+def train_net(model_function=build_VGG_net, save_name = 'VGG_small_el'):
     ''' Train and save a VGG preprocessed net '''
     # max_classes=len(vocab)
     img_path = '/data/temp_imgs_bigger/vgg_imgs/'
@@ -80,7 +80,7 @@ def train_net(model_function=build_VGG_net, save_name = 'VGG_sigmoid_el'):
 
     df['clean_ingred'] = clean_text_basic(df['ingred_list'])
 
-    with open('/data/el_keywords.pkl', 'r') as fp:
+    with open('/data/el_small_vocab.pkl', 'r') as fp:
         vocab = pickle.load(fp)
 
     train_df, test_df = create_validation_set(df)
@@ -92,12 +92,12 @@ def train_net(model_function=build_VGG_net, save_name = 'VGG_sigmoid_el'):
 
     base_path = '/data/'
     model = model_function(len(vocab), input_shape)
-    trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, vocab, epochs=10)
+    trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, vocab, epochs=10, batch_size=64)
 
     pickle_trained_nn(model, save_name)
 
-    return trained_model, indices_word
+    return trained_model, vocab
 
 if __name__ == '__main__':
     # trained_model, words = train_net(model_function=build_LSTM_net, save_name = 'LSTM_sigmoid_bigger')
-    trained_model, words = train_net()
+    trained_model, vocab = train_net()

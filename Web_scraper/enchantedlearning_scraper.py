@@ -38,7 +38,7 @@ def scrape_text(url):
     , 'spoon', 'spork', 'stomach', 'stove', 'straw', 'stringy' \
     , 'sub sandwich', 'submarine sandwich', 'supper', 'sustenance', 'sweet' \
     , 'take-out', 'tart', 'teapot', 'toaster', 'torte', 'tuber', 'vegetable' \
-    , 'vitamin', 'wok']
+    , 'vitamin', 'wok', 'hot','pop', 'cake', 'pop', 'sour']
     food_labels = []
     for i in tables:
         text = i.get_text()
@@ -61,5 +61,5 @@ if __name__ == '__main__':
 
     food_labels = scrape_text('http://www.enchantedlearning.com/wordlist/food.shtml')
 
-    with open('/data/el_keywords.pkl', 'wb') as f:
+    with open('/data/el_vocab_4_14.pkl', 'w') as f:
         pickle.dump(food_labels, f)

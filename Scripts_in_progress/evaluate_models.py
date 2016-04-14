@@ -61,7 +61,7 @@ def write_img_caption(model, indices_word, id, img_num, img_folder, df):
 
     # sorted_index = np.argsort(preds)[::-1]
 
-    pred_index = np.where(preds > .5)[0]
+    pred_index = np.where(preds > .3)[0]
 
     for i, next_index in enumerate(pred_index):
 
@@ -101,4 +101,4 @@ if __name__ == '__main__':
     df = pd.read_csv('/data/recipe_data.csv')
 
     model, indices_word = open_pkl_and_words('VGG_sigmoid_bigger')
-    pred_words = write_img_caption(model, indices_word, '6788', '0', 'vgg_imgs/', df)
+    pred_words = write_img_caption(model, indices_word, '8652', '16', 'vgg_imgs/', df)
