@@ -13,7 +13,6 @@ import indicoio
 from collections import defaultdict
 
 from itertools import izip_longest
-from itertools import izip_longest
 
 from nltk.stem import WordNetLemmatizer
 
@@ -106,8 +105,6 @@ def clean_text(ingred_list, max_ingred_len=3):
     '''
 
     wordnet_lemmatizer = WordNetLemmatizer()
-
-    ingred_caps = []
 
     ''' Here begins my long list of words to exclude '''
     exclude_words = ['teaspoons', 'teaspoon', 'tablespoon', 'tablespoons' \
@@ -313,14 +310,40 @@ def clean_text(ingred_list, max_ingred_len=3):
                     , 'expeel', 'farmhousestyle', 'fiddlehead', 'fiesta' \
                     , 'fiestastyle', 'fin', 'finger', 'fire', 'food', 'foo' \
                     , 'fork', 'four', 'one', 'two', 'three', 'five', 'six' \
-                    , 'seven']
+                    , 'seven', 'eight', 'nine', 'fritter', 'freshground' \
+                    , 'frenchstyle', 'freshfroxen', 'gai', 'garbage' \
+                    , 'garden', 'gel', 'germanstyle', 'gold', 'gourmet' \
+                    , 'great', 'northern', 'hair', 'halfmoons', 'halfpint' \
+                    , 'hawiian', 'highgluten', 'homestyle', 'hothouse' \
+                    , 'house', 'hubbard', 'icecold', 'iceberg', 'idaho' \
+                    , 'imitation', 'inchlong', 'inchwide', 'iron', 'jack' \
+                    , 'italianblend', 'italianstyle', 'japanese', 'jerk' \
+                    , 'johnsonville', 'kellogg', 'kernel', 'kingsford' \
+                    , 'lagerstyle', 'land', 'leg', 'lessodium', 'lid' \
+                    , 'montreal', 'montrealstyle', 'mission', 'melt' \
+                    , 'multi', 'nut', 'ocean', 'spray', 'oven', 'overnight' \
+                    , 'overripe', 'palegreen', 'palm', 'paperthin' \
+                    , 'parchment', 'pareve', 'pepperidge', 'pilsnerstyle' \
+                    , 'pit', 'pkg', 'plain', 'plus', 'pocket', 'porterhouse' \
+                    , 'prime', 'rib', 'readymade', 'rise', 'ribeye', 'ribbon' \
+                    , 'rotisserie', 'russet', 'vital', 'visible', 'virgin' \
+                    , 'extra', 'velvet', 'vegetable', 'unripe', 'uncut' \
+                    , 'uncle', 'twocheese', 'twine', 'twist', 'towel' \
+                    , 'transfatfree', 'trail', 'transparent', 'tri' \
+                    , 'triangle', 'triple', 'tritip', 'tropical', 'turbinado' \
+                    , 'udon', 'thai', 'thaistyle', 'texas', 'tie' \
+                    , 'threecheese', 'tm', 'tom', 'toothpick', 'torn' \
+                    , 'table', 'tablespoonsize', 'sun', 'super', 'sushistyle' \
+                    , 'sweet', 'swiss', 'straw', 'storebought', 'stoneground' \
+                    , 'visible', 'virgin', 'vital', 'winter', 'wet', 'well' \
+                    , 'tvp', 'wet', 'well', 'wellbeaten', 'wellshaken']
 
     exclude_ingredients = ['cool', 'collard', 'al fresco', 'green', 'pink' \
     , 'black', 'yellow', 'great northern', 'greek', 'creole', 'blue', 'bell' \
     , 'english']
     ingred_caption = []
     exclude_ending_1 = ['y']
-    exclude_ending_2 = ['ly', 'ed']
+    exclude_ending_2 = ['ly', 'ed', 'an']
     exclude_ending_3 = ['ing']
     # iterate over recipes
     for item in ingred_list:
@@ -355,13 +378,6 @@ def clean_text(ingred_list, max_ingred_len=3):
             item_final = item_final.strip('-')
 
             row_final.append(str(item_final))
-
-            # ''' Now use indico to extract keywords '''
-            # indicoio_keywords = indicoio.keywords(row_final, version=2)
-            # ingred_caption_keywords = []
-            # for i in indicoio_keywords:
-            #     keyword = str(max(i.iteritems(), key=operator.itemgetter(1))[0])
-            #     ingred_caption_keywords.append(keyword)
 
         # row_final.append('#END#')
 
