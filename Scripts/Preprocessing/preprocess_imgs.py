@@ -34,7 +34,7 @@ def load_imgs(img_arrays, input_shape):
 
     return X
 
-def preprocess_imgs(base_path, img_keys):
+def preprocess_imgs(base_path='/data/', img_keys):
     ''' Save .jpgs arrays and VGG net decomposed arrays
 
     Input:

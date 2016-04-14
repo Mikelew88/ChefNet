@@ -68,10 +68,10 @@ def load_VGG_16(img_size, weights_path='../weights/vgg16_weights.h5'):
             break
         g = f['layer_{}'.format(k)]
         weights = [g['param_{}'.format(p)] for p in range(g.attrs['nb_params'])]
-        print k
+        # print k
         model.layers[k].set_weights(weights)
     f.close()
-    print('Model loaded.')
+    print('VGG net loaded')
 
     return model
 

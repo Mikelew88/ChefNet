@@ -71,7 +71,7 @@ def save_nn(model, name):
     model.save_weights('/data/models/'+name+'_weights.h5')
     pass
 
-def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/temp_imgs_bigger/vgg_imgs/', input_shape=(512,3,3), fit_in_memory = True):
+def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/temp_imgs_bigger/vgg_imgs/', input_shape=(512,3,3), fits_in_memory = True):
     ''' Train and save NN '''
 
     df = pd.read_csv('/data/recipe_data.csv')
@@ -86,18 +86,12 @@ def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/
     train_df_expanded = create_df_image_key(train_df, img_path)
     test_df_expanded = create_df_image_key(test_df, img_path)
 
-    base_path = '/data/'
-
-    print 'Loading data... '
-    X_train = load_imgs(train_df_expanded['img_path'], input_shape)
-    y_train = vectorize_text(train_df_expanded['clean_ingred'], vocab)
-
-    X_test = load_imgs(test_df_expanded['img_path'], input_shape)
-    y_test = vectorize_text(test_df_expanded['clean_ingred'], vocab)
-
     model = model_function(len(vocab), input_shape)
 
-    if fit_in_memory:
+    if fits_in_memory:
+        print 'Loading data... '
+        X_test = load_imgs(test_df_expanded['img_path'], input_shape)
+        y_test = vectorize_text(test_df_expanded['clean_ingred'], vocab)
         model.fit(X_train, y_train, nb_epoch=10, validation_data = (X_test, y_test))
     else:
         trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, vocab, epochs=10, batch_size=64)
