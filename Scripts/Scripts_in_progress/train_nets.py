@@ -63,20 +63,13 @@ def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return izip_longest(*args, fillvalue=fillvalue)
 
-def pickle_trained_nn(model, name):
-    ''' Save Pickle of trained net '''
-    with open('/data/models/'+name+'.pkl', 'w') as f:
-        pickle.dump(model, f)
-    pass
-
 def save_nn(model, name):
     # save as JSON
     json_string = model.to_json()
     open('/data/models/'+name+'_architecture.json', 'w').write(json_string)
 
-    # model reconstruction from JSON: from keras.models import model_from_json model = model_from_json(json_string)
-
     model.save_weights('/data/models/'+name+'_weights.h5')
+    pass
 
 def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/temp_imgs_bigger/vgg_imgs/', input_shape=(512,3,3), fit_in_memory = True):
     ''' Train and save NN '''
@@ -115,5 +108,5 @@ def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/
     return model, vocab
 
 if __name__ == '__main__':
-    # trained_model, words = train_net(model_function=build_MLP_net, save_name = 'MLP_non_batch', img_path = '/data/temp_imgs_bigger/preprocessed_imgs/', input_shape = (3,100,100))
-    trained_model, vocab = train_net(save_name = 'VGG_full', img_path = '/data/vgg_imgs/')
+    trained_model, words = train_net(model_function=build_MLP_net, save_name = 'MLP_full_batch', img_path = '/data/preprocessed_imgs/', input_shape = (3,100,100), fits_in_memory=False)
+    # trained_model, vocab = train_net(save_name = 'VGG_full', img_path = '/data/vgg_imgs/')
