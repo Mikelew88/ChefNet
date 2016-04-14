@@ -19,7 +19,7 @@ def load_model_and_vocab(model_name):
 
     return model, vocab
 
-def write_img_caption(model, indices_word, id, img_num, img_folder, df):
+def write_img_caption(model, indices_word, id, img_num, img_folder, df, threshold=.5):
 
     img_arr = np.load('/data/'+img_folder+id+'_'+img_num+'.npy')
 
@@ -34,7 +34,7 @@ def write_img_caption(model, indices_word, id, img_num, img_folder, df):
     print '----- Generating with Img: ' + img_num
     sys.stdout.write(generated)
 
-    pred_index = np.where(preds > .5)[0]
+    pred_index = np.where(preds > threshold)[0]
 
     for i, next_index in enumerate(pred_index):
 
@@ -65,5 +65,5 @@ def write_img_caption(model, indices_word, id, img_num, img_folder, df):
 if __name__ == '__main__':
     df = pd.read_csv('/data/recipe_data.csv')
 
-    model, vocab = load_model_and_vocab('LSTM_sigmoid_bigger')
-    pred_words = write_img_caption(model, vocab, '8452', '4', 'preprocessed_imgs/', df)
+    model, vocab = load_model_and_vocab('VGG_non_batch')
+    pred_words = write_img_caption(model, vocab, '8452', '4', 'vgg_imgs/', df, threshold=.3)

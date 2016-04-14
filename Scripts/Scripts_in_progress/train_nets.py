@@ -13,14 +13,13 @@ from sklearn.metrics import log_loss
 
 import cPickle as pickle
 
-from preprocess_text_el import clean_text_basic, vectorize_text
-from preprocess_data import create_validation_set, create_df_image_key, load_imgs
-
+from vectorize_text import clean_text, vectorize_text
+from prepare_data_for_model import create_validation_set, create_df_image_key, load_imgs
 
 from build_models import build_MLP_net, build_VGG_net, build_LSTM_net
 
 def batch_train(train_df, test_df, model, input_shape, vocab, epochs = 10, batch_size = 50, print_loss=False):
-    ''' Since all images do not fit into memory, we must batch process ourselves
+    ''' If all images do not fit into memory, we must batch process ourselves
     '''
 
     for e in range(1,epochs+1):
@@ -79,16 +78,14 @@ def save_nn(model, name):
 
     model.save_weights('/data/models/'+name+'_weights.h5')
 
-
-
-def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/temp_imgs_bigger/vgg_imgs/', input_shape=(512,3,3)):
+def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/temp_imgs_bigger/vgg_imgs/', input_shape=(512,3,3), fit_in_memory = True):
     ''' Train and save NN '''
 
     df = pd.read_csv('/data/recipe_data.csv')
 
-    df['clean_ingred'] = clean_text_basic(df['ingred_list'])
+    df['clean_ingred'] = clean_text(df['ingred_list'])
 
-    with open('/data/el_small_vocab.pkl', 'r') as fp:
+    with open('/data/small_vocab.pkl', 'r') as fp:
         vocab = pickle.load(fp)
 
     train_df, test_df = create_validation_set(df)
@@ -106,9 +103,11 @@ def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/
     y_test = vectorize_text(test_df_expanded['clean_ingred'], vocab)
 
     model = model_function(len(vocab), input_shape)
-    # trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, vocab, epochs=10, batch_size=64)
 
-    model.fit(X_train, y_train, nb_epoch=10, validation_data = (X_test, y_test))
+    if fit_in_memory:
+        model.fit(X_train, y_train, nb_epoch=10, validation_data = (X_test, y_test))
+    else:
+        trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, vocab, epochs=10, batch_size=64)
 
     save_nn(model, save_name)
     print save_name + ' has been saved'
@@ -116,5 +115,5 @@ def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/
     return model, vocab
 
 if __name__ == '__main__':
-    trained_model, words = train_net(model_function=build_MLP_net, save_name = 'MLP_non_batch', img_path = '/data/temp_imgs_bigger/preprocessed_imgs/', input_shape = (3,100,100))
-    # trained_model, vocab = train_net(save_name='VGG_non_batch')
+    # trained_model, words = train_net(model_function=build_MLP_net, save_name = 'MLP_non_batch', img_path = '/data/temp_imgs_bigger/preprocessed_imgs/', input_shape = (3,100,100))
+    trained_model, vocab = train_net(save_name = 'VGG_full', img_path = '/data/vgg_imgs/')

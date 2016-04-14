@@ -11,7 +11,7 @@ __Outline__
 
 ### Data Wrangling
 
-The first step of this project was to scrape allrecipes.com. From that website, I scraped
+The first step of this project was to scrape allrecipes.com. From that website, I scraped 
 
 ### Natural Language Processing
 

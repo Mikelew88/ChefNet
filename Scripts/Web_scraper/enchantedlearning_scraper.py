@@ -38,7 +38,7 @@ def scrape_text(url):
     , 'spoon', 'spork', 'stomach', 'stove', 'straw', 'stringy' \
     , 'sub sandwich', 'submarine sandwich', 'supper', 'sustenance', 'sweet' \
     , 'take-out', 'tart', 'teapot', 'toaster', 'torte', 'tuber', 'vegetable' \
-    , 'vitamin', 'wok', 'hot','pop', 'cake', 'pop', 'sour', 'tea']
+    , 'vitamin', 'wok', 'hot','pop', 'cake', 'pop', 'sour', 'tea', 'ice']
     food_labels = []
     for i in tables:
         text = i.get_text()

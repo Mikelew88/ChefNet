@@ -20,7 +20,7 @@ from sklearn.preprocessing import MultiLabelBinarizer
 
 ''' Text processing '''
 
-def clean_text_basic(ingred_list):
+def clean_text(ingred_list):
     ''' Clean ingredient text to only keep key words for Vectorizer
 
     Input:
@@ -78,14 +78,44 @@ def create_small_vocab(y, vocab):
     ingred_counts = np.sum(y, axis=0)
 
     small_vocab = []
+    word_cloud_text = ''
+
     for i, vocab in zip (ingred_counts, vocab):
         if i > 100 and vocab:
             small_vocab.append(vocab)
+            word_cloud_text.join(' '+vocab*i)
 
-    with open('/data/el_small_vocab.pkl', 'w') as f:
-        pickle.dump(small_vocab, f)
-        
-    return small_vocab
+    return small_vocab, word_cloud_text
+
+
+def save_vocab(vocab, name):
+    with open('/data/'+name+'.pkl', 'w') as f:
+        pickle.dump(vocab, f)
+
+
+
+def generate_wordcloud(word_cloud_text):
+    ''' Generate a simple word cloud of vocabulary '''
+    from wordcloud import WordCloud
+
+
+
+    # Generate a word cloud image
+    wordcloud = WordCloud().generate(word_cloud_text)
+
+    # Display the generated image:
+    # the matplotlib way:
+    import matplotlib.pyplot as plt
+    plt.imshow(wordcloud)
+    plt.axis("off")
+
+    # take relative word frequencies into account, lower max_font_size
+    wordcloud = WordCloud(max_font_size=40, relative_scaling=.5).generate(word_cloud_text)
+    plt.figure()
+    plt.imshow(wordcloud)
+    plt.axis("off")
+    plt.show()
+
 
 if __name__ == '__main__':
 
@@ -97,4 +127,6 @@ if __name__ == '__main__':
     text_list = clean_text_basic(df['ingred_list'])
     y = vectorize_text(text_list, vocab)
 
-    small_vocab = create_small_vocab(y, vocab)
+    small_vocab, word_cloud_text = create_small_vocab(y, vocab)
+
+    save_vocab(small_vocab, 'small_vocab')
