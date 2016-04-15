@@ -4,16 +4,16 @@ Here you may find my Galvanize Capstone Project. Stay Tuned!
 
 __Outline__
 
-* [Data Wrangling](#data-wrangling)
-* [Natural Language Processing](#natural-language-processing)
+* [Data](#data-wrangling)
+* [Ingredient Categorization](#ingredient-categorization)
 * [Image Processing](#image-processing)
 * [Neural Network Architecture](#neral-network-architecture)
 
-### Data Wrangling
+### Data
 
-The first step of this project was to scrape allrecipes.com. From that website, I scraped 
+The first step of this project was to scrape allrecipes.com. From that website, I scraped
 
-### Natural Language Processing
+### Ingredient Categorization
 
 ### Image Processing
 

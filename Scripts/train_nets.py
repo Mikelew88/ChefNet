@@ -74,14 +74,14 @@ def save_nn(model, name):
 def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/temp_imgs_bigger/vgg_imgs/', input_shape=(512,3,3), fits_in_memory = True):
     ''' Train and save NN '''
 
-    df = pd.read_csv('/data/recipe_data.csv')
-
-    df['clean_ingred'] = clean_text(df['ingred_list'])
-
     with open('/data/small_vocab.pkl', 'r') as fp:
         vocab = pickle.load(fp)
 
-    train_df, test_df = create_validation_set(df)
+    with open('/data/dfs/train_df.pkl', 'r') as f:
+        train_df = pickle.load(f)
+
+    with open('/data/dfs/test_df.pkl', 'r') as f:
+        test_df = pickle.load(f)
 
     train_df_expanded = create_df_image_key(train_df, img_path)
     test_df_expanded = create_df_image_key(test_df, img_path)

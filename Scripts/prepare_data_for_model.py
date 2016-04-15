@@ -9,6 +9,10 @@ import numpy as np
 import operator
 import itertools
 
+import cPickle as pickle
+
+from vectorize_text import clean_text
+
 def create_validation_set(df):
     ''' Create set of recipes that will be set aside for validation
     '''
@@ -60,27 +64,19 @@ def load_imgs(img_arrays, input_shape):
 
     return X
 
+def Save_Train_and_Test_df():
+    df = pd.read_csv('/data/dfs/recipe_data.csv')
+
+    df['clean_ingred'] = clean_text(df['ingred_list'])
+
+    train_df, test_df = create_validation_set(df)
+
+    with open('/data/dfs/train_df.pkl', 'w') as f:
+        pickle.dump(train_df, f)
+
+    with open('/data/dfs/test_df.pkl', 'w') as f:
+        pickle.dump(test_df, f)
+    pass
+
 if __name__ == '__main__':
-    base_path = '../'
-    df = pd.read_csv(base_path+'data/recipe_data.csv')
-    # vectorizer, words = vectorize_text(df['ingred_list'], 1000)
-    text_list = clean_text(df['ingred_list'])
-
-    word_indices, indices_word, word_keyword = create_text_vectorizer(text_list)
-    # vocab = sorted(set(itertools.chain.from_iterable(text_list)))
-    # indicoio_keywords = indicoio.keywords(vocab, version=2)
-    # ingred_caption_keywords = []
-    # for i in indicoio_keywords:
-    #     try:
-    #         keyword = str(max(i.iteritems(), key=operator.itemgetter(1))[0])
-    #         ingred_caption_keywords.append(keyword)
-    #     except:
-    #         pass
-    #
-    # new_vocab = sorted(set(ingred_caption_keywords))
-    # print new_vocab
-    # print len(new_vocab)
-
-    # y, indices_word = vectorize_text(df['clean_text'])
-    # X, y = tensorize_text(words[:1])
-    # array, words = vectorize_text(test, 10000)
+    Save_Train_and_Test_df()

@@ -1,3 +1,5 @@
+''' Various NN Architecture I've tried '''
+
 from keras.datasets import cifar10
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential

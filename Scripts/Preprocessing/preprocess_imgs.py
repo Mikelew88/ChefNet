@@ -22,7 +22,36 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from skimage.io import imread_collection, imread
 from skimage.transform import resize
 
-from train_VGG_net import load_VGG_16, get_activations
+from load_VGG_net import load_VGG_16, get_activations
+
+def create_df_image_key(df_in, dir_path):
+    ''' Join ingredient lists to image locations, one to many
+
+    Input:
+        df_in = dataframe of unique recipes
+        dir_path = local path to image folder
+
+    Output:
+        DataFrame with one row for each image of a recipe
+    '''
+
+    # We must copy the ingredient vector for each distinct image for a single recipe
+    img_dir = os.listdir(dir_path)
+
+    dir_index = [int(x.split('_')[0]) for x in img_dir]
+
+    img_paths = [dir_path+x for x in img_dir]
+
+    df_dir = pd.DataFrame(img_paths, index=dir_index)
+    df_dir.columns = ['img_path']
+
+    df_in.index = df_in['id']
+
+    df_out = df_in.merge(df_dir, how='inner', left_index=True, right_index=True)
+
+    df_out['file_key'] = [x.split('/')[-1].split('.')[0] for x in df_out['img_path']]
+
+    return df_out
 
 ''' Image Processing '''
 
@@ -34,7 +63,7 @@ def load_imgs(img_arrays, input_shape):
 
     return X
 
-def preprocess_imgs(base_path='/data/', img_keys):
+def preprocess_imgs(img_keys):
     ''' Save .jpgs arrays and VGG net decomposed arrays
 
     Input:
@@ -44,6 +73,7 @@ def preprocess_imgs(base_path='/data/', img_keys):
         Array of vectorized images, and list of rows to drop due to bad images
     '''
     img_size = 100
+    base_path='/data/'
     model = load_VGG_16(img_size, base_path+'weights/vgg16_weights.h5')
 
     for img_key in img_keys:
@@ -76,5 +106,13 @@ def save_processed_imgs_to_disk(base_path='/data/'):
     preprocess_imgs(base_path, df_expanded['file_key'])
     pass
 
+def find_unprocessed_imgs():
+    processed_dir = [x.split('.')[0] for x in os.listdir('/data/preprocessed_imgs/')]
+    unprocessed_dir = [x.split('.')[0] for x in os.listdir('/data/Recipe_Images/')]
+
+    return list(set(unprocessed_dir)-set(processed_dir))
+
+
 if __name__ == '__main__':
-    pass
+    unprocessed = find_unprocessed_imgs()
+    preprocess_imgs(unprocessed)

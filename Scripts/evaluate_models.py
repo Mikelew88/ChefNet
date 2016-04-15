@@ -4,12 +4,17 @@ import numpy as np
 import pandas as pd
 import json
 
+from sklearn.metrics import f1_score, classification_report
+
 from skimage.io import imread
 from skimage.transform import resize
 
 from keras.models import model_from_json
 
-sys.path.append('../Preprocessing')
+from vectorize_text import vectorize_text
+from prepare_data_for_model import create_df_image_key, load_imgs
+
+sys.path.append('Preprocessing')
 from load_VGG_net import load_VGG_16, get_activations
 
 def load_model_and_vocab(model_name):
@@ -18,7 +23,7 @@ def load_model_and_vocab(model_name):
     model = model_from_json(open('/data/models/'+model_name+'_architecture.json').read())
     model.load_weights('/data/models/'+model_name+'_weights.h5')
 
-    with open('/data/small_vocab.pkl', 'r') as fp:
+    with open('/data/vocab/small_vocab.pkl', 'r') as fp:
         vocab = pickle.load(fp)
 
     return model, vocab
@@ -91,15 +96,33 @@ def load_preprocessed(img_id, img_num, img_folder):
 
     return img_arr, img_id
 
+def validation_metrics(model, vocab, input_shape, img_path):
+    ''' Generate some metrics with validation set '''
+
+    with open('/data/dfs/test_df.pkl', 'r') as f:
+        test_df = pickle.load(f)
+
+    test_df_expanded = create_df_image_key(test_df, img_path)
+
+    X_test = load_imgs(np.array(test_df_expanded['img_path']), input_shape)
+    y_true = vectorize_text(np.array(test_df_expanded['clean_ingred']), vocab)
+
+    y_pred = model.predict(X_test)
+
+    print 'Average F1 Score: {}'.format(np.mean(f1_score(y_test,y_pred))
+    print 'Classification Report: '+str(classification_report(y_true,y_pred))
+
+
 if __name__ == '__main__':
-    df = pd.read_csv('/data/recipe_data.csv')
+    df = pd.read_csv('/data/dfs/recipe_data.csv')
 
     model, vocab = load_model_and_vocab('VGG_full')
 
-    img_array, img_id = load_preprocessed(8452, 4, 'vgg_imgs/')
-    write_img_caption(model, vocab, img_array, df, img_id = img_id, threshold=.3)
-
-    print '\n'
-
-    img_array = load_jpg('/data/Recipe_Images/237315_0.jpg', (100,100))
-    write_img_caption(model, vocab, img_array, df, threshold=.3)
+    validation_metrics(model, vocab, (512,3,3), '/data/vgg_imgs/')
+    # img_array, img_id = load_preprocessed(8452, 4, 'vgg_imgs/')
+    # write_img_caption(model, vocab, img_array, df, img_id = img_id, threshold=.3)
+    #
+    # print '\n'
+    #
+    # img_array = load_jpg('/data/Recipe_Images/237315_0.jpg', (100,100))
+    # write_img_caption(model, vocab, img_array, df, threshold=.3)
