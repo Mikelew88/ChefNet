@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import json
 
-from sklearn.metrics import f1_score, classification_report
+from sklearn.metrics import log_loss, classification_report, confusion_matrix, f1_score
 
 from skimage.io import imread
 from skimage.transform import resize
@@ -96,7 +96,17 @@ def load_preprocessed(img_id, img_num, img_folder):
 
     return img_arr, img_id
 
-def validation_metrics(model, vocab, input_shape, img_path):
+def make_cutoff(y, threshold):
+    y_pred = np.zeros((y.shape), dtype=bool)
+    for row, obs in enumerate(y_pred):
+        for col, val in enumerate(obs):
+            if val > threshold:
+                y_pred[row,col] = True
+            else:
+                y_pred[row,col] = False
+    return y_pred
+
+def validation_metrics(model, vocab, input_shape, img_path, threshold = .5):
     ''' Generate some metrics with validation set '''
 
     with open('/data/dfs/test_df.pkl', 'r') as f:
@@ -109,18 +119,31 @@ def validation_metrics(model, vocab, input_shape, img_path):
 
     y_pred = model.predict(X_test)
 
-    print 'Average F1 Score: {}'.format(np.mean(f1_score(y_test,y_pred))
-    print 'Classification Report: '+str(classification_report(y_true,y_pred))
+    ''' find best threshold to maximize f1 score '''
+    # for i,food in enumerate(vocab):
+    #     print food+':'
+    #     for t in np.arange(.1, .9, .1):
+    #         y_pred_cats = make_cutoff(y_pred, t)
+    #         print 'Threshold {}: {}'.format(t, np.mean(f1_score(y_true[:,i], y_pred_cats[:,i])))
+
+    # y_pred_cats = make_cutoff(y_pred, .3)
+    # import pdb; pdb.set_trace()
+
+    print classification_report(y_true,y_pred)
+
+    print 'Average Log Loss Score: {}'.format(np.mean(log_loss(y_true,y_pred)))
+
 
 
 if __name__ == '__main__':
     df = pd.read_csv('/data/dfs/recipe_data.csv')
-
+    # Other model: MLP_full_batch
     model, vocab = load_model_and_vocab('VGG_full')
 
-    validation_metrics(model, vocab, (512,3,3), '/data/vgg_imgs/')
+    # Other folder: /data/preprocessed_imgs/
+    # validation_metrics(model, vocab, (512,3,3), '/data/vgg_imgs/', .25)
     # img_array, img_id = load_preprocessed(8452, 4, 'vgg_imgs/')
-    # write_img_caption(model, vocab, img_array, df, img_id = img_id, threshold=.3)
+    write_img_caption(model, vocab, img_array, df, img_id = img_id, threshold=.3)
     #
     # print '\n'
     #

@@ -24,8 +24,6 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from skimage.io import imread_collection, imread
 from skimage.transform import resize
 
-from train_VGG_net import load_VGG_16, get_activations
-
 indicoio.config.api_key = os.environ['G_INDICO_API_KEY']
 
 def clean_text(ingred_list, max_ingred_len=3):
@@ -305,7 +303,7 @@ def clean_text(ingred_list, max_ingred_len=3):
 
     ingred_caption_final = []
     for row in ingred_caption:
-        # row_final=['#START#']
+        row_final=['#START#']
         row_final = []
         for item in row:
             item_final = ' '.join(item)
@@ -313,7 +311,7 @@ def clean_text(ingred_list, max_ingred_len=3):
 
             row_final.append(str(item_final))
 
-        # row_final.append('#END#')
+        row_final.append('#END#')
 
         ingred_caption_final.append(row_final)
 
@@ -379,9 +377,6 @@ def tensorize_text(text_list, word_indices, max_caption_len):
     return X, y
 
 if __name__ == '__main__':
-    base_path = '../'
-    df = pd.read_csv(base_path+'data/recipe_data.csv')
+    df = pd.read_csv('/data/dfs/recipe_data.csv')
     # vectorizer, words = vectorize_text(df['ingred_list'], 1000)
     text_list = clean_text(df['ingred_list'])
-
-    word_indices, indices_word, word_keyword = create_text_vectorizer(text_list)

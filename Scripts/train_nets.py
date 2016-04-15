@@ -19,8 +19,7 @@ from prepare_data_for_model import create_validation_set, create_df_image_key, l
 from build_models import build_MLP_net, build_VGG_net, build_LSTM_net
 
 def batch_train(train_df, test_df, model, input_shape, vocab, epochs = 10, batch_size = 50, print_loss=False):
-    ''' If all images do not fit into memory, we must batch process ourselves
-    '''
+    ''' Batch processing for when images don't all fit in memory '''
 
     for e in range(1,epochs+1):
         # Shuffle df rows for each epoch
