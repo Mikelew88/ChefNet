@@ -1,3 +1,7 @@
+'''
+This module contains code used for testing various modes, and predicting ingredients in an image for anechdotal testing
+'''
+
 import cPickle as pickle
 import sys
 import numpy as np
@@ -11,10 +15,10 @@ from skimage.transform import resize
 
 from keras.models import model_from_json
 
-from vectorize_text import vectorize_text
-from prepare_data_for_model import create_df_image_key, load_imgs
+from vectorize_data import vectorize_text, load_imgs
+from preprocess_df import create_df_image_key
 
-sys.path.append('Preprocessing')
+sys.path.append('../Preprocessing')
 from load_VGG_net import load_VGG_16, get_activations
 
 def load_model_and_vocab(model_name):
@@ -28,9 +32,9 @@ def load_model_and_vocab(model_name):
 
     return model, vocab
 
-
 def write_img_caption(model, vocab, img_arr, df, img_id=None, threshold=.5):
-    ''' predict words in an img '''
+    ''' Predict words in an img '''
+
     preds = model.predict(img_arr, verbose=0)[0]
 
     if img_id:
@@ -88,7 +92,8 @@ def load_jpg(img_path, img_shape, vgg=True):
     return final_array
 
 def load_preprocessed(img_id, img_num, img_folder):
-    ''' prepare data for captioning that has been preprocessed '''
+    ''' Prepare data for captioning that has been preprocessed '''
+
     img_arr = np.load('/data/'+img_folder+str(img_id)+'_'+str(img_num)+'.npy')
 
     if img_folder == 'preprocessed_imgs/':
@@ -97,8 +102,10 @@ def load_preprocessed(img_id, img_num, img_folder):
     return img_arr, img_id
 
 def make_cutoff(y, threshold):
+    ''' helper fuction to convert predicted probabilites to boolean '''
+
     y_pred = np.zeros((y.shape), dtype=bool)
-    for row, obs in enumerate(y_pred):
+    for row, obs in enumerate(y):
         for col, val in enumerate(obs):
             if val > threshold:
                 y_pred[row,col] = True
@@ -118,7 +125,6 @@ def validation_metrics(model, vocab, input_shape, img_path, threshold = .5):
     y_true = vectorize_text(np.array(test_df_expanded['clean_ingred']), vocab)
 
     y_pred = model.predict(X_test)
-
     ''' find best threshold to maximize f1 score '''
     # for i,food in enumerate(vocab):
     #     print food+':'
@@ -126,10 +132,9 @@ def validation_metrics(model, vocab, input_shape, img_path, threshold = .5):
     #         y_pred_cats = make_cutoff(y_pred, t)
     #         print 'Threshold {}: {}'.format(t, np.mean(f1_score(y_true[:,i], y_pred_cats[:,i])))
 
-    # y_pred_cats = make_cutoff(y_pred, .3)
-    # import pdb; pdb.set_trace()
+    y_pred_cats = make_cutoff(y_pred, .25)
 
-    print classification_report(y_true,y_pred)
+    print classification_report(y_true,y_pred_cats, target_names=list(vocab))
 
     print 'Average Log Loss Score: {}'.format(np.mean(log_loss(y_true,y_pred)))
 
@@ -141,9 +146,10 @@ if __name__ == '__main__':
     model, vocab = load_model_and_vocab('VGG_full')
 
     # Other folder: /data/preprocessed_imgs/
-    # validation_metrics(model, vocab, (512,3,3), '/data/vgg_imgs/', .25)
+    # (512,3,3)
+    validation_metrics(model, vocab, (512,3,3), '/data/vgg_imgs/', .25)
     # img_array, img_id = load_preprocessed(8452, 4, 'vgg_imgs/')
-    write_img_caption(model, vocab, img_array, df, img_id = img_id, threshold=.3)
+    # write_img_caption(model, vocab, img_array, df, img_id = img_id, threshold=.3)
     #
     # print '\n'
     #

@@ -1,4 +1,6 @@
-''' Various NN Architecture I've tried '''
+'''
+This module contains various neural network Architecture that I played around with. All net construction comes from here.
+'''
 
 from keras.datasets import cifar10
 from keras.preprocessing.image import ImageDataGenerator
@@ -10,8 +12,7 @@ from keras.optimizers import SGD, Adam
 from keras.utils import np_utils
 
 def build_MLP_net(nb_classes, input_shape):
-    ''' Create a preliminary Keras MLP model
-    '''
+    ''' This acrcutecture was suggested by Keras for the NSIT handrwitten number database, I found it did well, but not as well as when I leveraged VGG net for help '''
 
     model = Sequential()
 
@@ -46,8 +47,7 @@ def build_MLP_net(nb_classes, input_shape):
     return model
 
 def build_VGG_net(nb_classes, input_shape):
-    ''' Create a Keras model for images preprocessed with VGG net
-    '''
+    ''' This arcutecture proved the most fruitful, utilizing transfer learning from VGG net '''
 
     model = Sequential()
 
@@ -75,8 +75,7 @@ def build_VGG_net(nb_classes, input_shape):
     return model
 
 def build_LSTM_net(nb_classes, input_shape):
-    ''' Train and save a LSTM net
-    '''
+    ''' This net was used to try and pass each convolution from VGG as a tensor for and LSTM, it was very slow to trian and didn't prove very fruitful '''
 
     model = Sequential()
 
@@ -98,6 +97,9 @@ def build_LSTM_net(nb_classes, input_shape):
     return model
 
 def build_RNN(nb_classes, input_shape, max_caption_len):
+    ''' This was an artifact of trying to take an image captioning approach to learn ingredients, I felt the code was interesting, but the approach was not useful for my goal of guessing the components of a dish '''
+
+
     img_model = Sequential()
 
     img_model.add(Convolution2D(512, 3, 3, border_mode='same',

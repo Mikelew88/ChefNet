@@ -1,9 +1,11 @@
+''' Code built upon code Sean Sall. Thanks Sean! '''
+
 from threading import Thread
 import urllib, urllib2
 from bs4 import BeautifulSoup
 
 
-class RequestInfoThread(Thread):
+class request_info_thread(Thread):
     '''
     Inherits from Thread so I can store results of my threading.
     I want to be able to return something from my threading. This
@@ -11,6 +13,7 @@ class RequestInfoThread(Thread):
     and data gathering that I want to do, but store the results on
     the class so that I can access them later.
     '''
+
     def __init__(self, recipe_id, link):
         super(RequestInfoThread, self).__init__()
         self.recipe_id = recipe_id
@@ -33,6 +36,7 @@ class RequestInfoThread(Thread):
         Make sure that if there is missing information that is not crucial to my analysis, we still store the data.
         By checking the Mongo table during the extraction process we can save time by not getting the html of the url if that url already exists in the table.
         '''
+
         item_name = self.soup.find('h1', {'class':'recipe-summary__h1'}).text
 
         submitter_name = self.soup.find('span', {'class':'submitter__name'}).text
@@ -77,10 +81,11 @@ class RequestInfoThread(Thread):
         pass
 
 def null_time_helper(func):
-    '''
-    Input: function
+    ''' This will allow me to store pages that do not contain all scraped fields
+
+    Input:  function
+
     Output: value of function or None
-    This will allow me to store pages that do not contain all scraped fields.
     '''
     try:
         val = func.get('datetime')
@@ -89,5 +94,5 @@ def null_time_helper(func):
     return val
 
 if __name__ == '__main__':
-    test = RequestInfoThread(211166, '/recipe/211166/ham-and-broccoli-bake/?internalSource=rotd&referringId=1&referringContentType=recipe%20hub')
+    test = request_info_thread(211166, '/recipe/211166/ham-and-broccoli-bake/?internalSource=rotd&referringId=1&referringContentType=recipe%20hub')
     test.start()

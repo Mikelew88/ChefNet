@@ -29,11 +29,9 @@ indicoio.config.api_key = os.environ['G_INDICO_API_KEY']
 def clean_text(ingred_list, max_ingred_len=3):
     ''' Clean ingredient text to only keep key words for Vectorizer
 
-    Input:
-        List of ingredients as scraped
+    Input:  List of ingredients as scraped
 
-    Output:
-        Underscored string for each ingredient
+    Output: List of ingredinets for each recipe
     '''
 
     wordnet_lemmatizer = WordNetLemmatizer()
@@ -321,11 +319,9 @@ def clean_text(ingred_list, max_ingred_len=3):
 def create_text_vectorizer(text_list):
     ''' Convert Ingredients to Count Vectors
 
-    Input:
-        Raw ingredient list as scraped
+    Input:  raw ingredient list as scraped
 
-    Output:
-        Count vector
+    Output: count vector
     '''
 
     vocab = sorted(set(itertools.chain.from_iterable(text_list)))
@@ -358,6 +354,7 @@ def create_text_vectorizer(text_list):
 
 def vectorize_text(text_list, word_indices, word_keyword):
     ''' Vectorize multiple cleaned lists of ingredients '''
+
     y = np.zeros((len(text_list), len(word_indices)), dtype=np.bool)
     for i, recipe in enumerate(text_list):
         for t, word in enumerate(recipe):
@@ -365,16 +362,6 @@ def vectorize_text(text_list, word_indices, word_keyword):
             if keyword != '':
                 y[i, word_indices[keyword]] = 1
     return y
-
-def tensorize_text(text_list, word_indices, max_caption_len):
-    y = np.zeros((len(text_list), len(word_indices)), dtype=np.bool)
-    X = np.zeros((len(sentences), max_caption_len, len(chars)), dtype=np.bool)
-
-    for i, recipe in enumerate(text_list):
-        for t, word in enumerate(recipe):
-            X[i, t, word_indices[word]] = 1
-        y[i, t, word_indices[text_list[i+1]]] = 1
-    return X, y
 
 if __name__ == '__main__':
     df = pd.read_csv('/data/dfs/recipe_data.csv')

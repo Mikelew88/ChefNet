@@ -7,19 +7,15 @@ import urllib, urllib2
 from pymongo import MongoClient
 import multiprocessing
 from threading import Thread
-from RequestInfoThread import RequestInfoThread
+from request_info_thread import request_info_thread
 
 def Pull_Recipe_Links(i):
     '''
     Pull links to all recipes on a search page and send them to search scraper
 
-    Input:
-        Page Number to search for recipe links on
-    Output:
-        None
+    Input:  (1) page Number to search for recipe links on
     '''
 
-    """define opener"""
     class MyOpener(urllib.FancyURLopener):
         version = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11'
     myopener = MyOpener()
@@ -50,14 +46,12 @@ def Pull_Recipe_Links(i):
 
 def scrape_search(link, recipe_db):
     '''
-    Create RequestInfoThreads for a page of the website
+    Create request_info_threads for a page of the website
 
-    Input:
-        link = Link to search page
-        recipe_db = recipe MongoDB
+    Input:  (1) link to search page
+            (2) recipe MongoDB
 
-    Output:
-        List of data to be stored in MongoDB
+    Output: (1) list of data to be stored in MongoDB
     '''
 
     #Parse url string to locate recipe name and number
@@ -72,7 +66,7 @@ def scrape_search(link, recipe_db):
     threads=[]
     mongo_update_lst = []
 
-    t = RequestInfoThread(recipe_id,link)
+    t = request_info_thread(recipe_id,link)
 
     t.start()
     threads.append(t)

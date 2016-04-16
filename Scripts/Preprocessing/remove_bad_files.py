@@ -2,9 +2,7 @@ import os
 from skimage.io import imread
 
 def remove_bad_jpgs(dir_path='/data/Recipe_Images/', size = .001):
-    '''
-    Go through images and remove empty files before preprocessing
-    '''
+    ''' Go through images and remove empty files before preprocessing '''
 
     img_dir = os.listdir(dir_path)
 
@@ -15,9 +13,7 @@ def remove_bad_jpgs(dir_path='/data/Recipe_Images/', size = .001):
             os.rename(jpg_path, "/data/Bad_Images/"+jpg)
 
 def remove_empty_jpgs(dir_path='/data/Recipe_Images/'):
-    '''
-    Go through images and remove blank and/or black and white images
-    '''
+    ''' Go through images and remove blank and/or black and white images '''
     img_dir = os.listdir(dir_path)
 
     for jpg in img_dir:

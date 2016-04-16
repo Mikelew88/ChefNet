@@ -8,6 +8,7 @@ from preprocess_data import clean_text
 
 def open_pkl_and_words(model_name):
     ''' Load pickled model and list of words '''
+
     with open('/data/models/'+model_name+'.pkl', 'r') as f:
         model = pickle.load(f)
 
@@ -21,6 +22,7 @@ def open_pkl_and_words(model_name):
 
 def predict_img(model, words, id, img_num, img_folder, df):
     ''' Allow user to test model with a specific image'''
+
     img_arr = np.load('/data/'+img_folder+id+'_'+img_num+'.npy')
 
     pred = np.array(model.predict(img_arr))
@@ -41,12 +43,13 @@ def predict_img(model, words, id, img_num, img_folder, df):
     return pred_words, true_y
 
 def sample(a, temperature=1.0):
-    # helper function to sample an index from a probability array
+    ''' Helper function to sample an index from a probability array '''
     a = np.log(a) / temperature
     a = np.exp(a) / np.sum(np.exp(a))
     return np.argsort(np.random.multinomial(1, a, 1))[::-1]
 
 def write_img_caption(model, indices_word, id, img_num, img_folder, df):
+    ''' Generate a list of ingredients for an image '''
 
     img_arr = np.load('/data/'+img_folder+id+'_'+img_num+'.npy')
     preds = model.predict(img_arr, verbose=0)[0]

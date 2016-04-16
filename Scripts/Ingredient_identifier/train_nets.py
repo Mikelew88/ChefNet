@@ -13,13 +13,26 @@ from sklearn.metrics import log_loss
 
 import cPickle as pickle
 
-from vectorize_text import clean_text, vectorize_text
-from prepare_data_for_model import create_validation_set, create_df_image_key, load_imgs
+from vectorize_data import clean_text, vectorize_text, load_imgs
+from preprocess_df import create_validation_set, create_df_image_key
 
 from build_models import build_MLP_net, build_VGG_net, build_LSTM_net
 
 def batch_train(train_df, test_df, model, input_shape, vocab, epochs = 10, batch_size = 50, print_loss=False):
-    ''' Batch processing for when images don't all fit in memory '''
+    ''' Batch processing for when images don't all fit in memory
+
+    Input:  (1) traing dataframe
+            (2) validation dataframe
+            (3) keras model to be trained
+            (4) shape of image data, (3,100,100) or (512,3,3)
+            (5) vocabulary of words, classes being predicted
+            (6) epochs to trian on
+            (7) batch size of epics
+            (8) if true, will print loss and accuracy of each batch
+
+    Output: (1) trained keras model
+
+    '''
 
     for e in range(1,epochs+1):
         # Shuffle df rows for each epoch
@@ -55,15 +68,17 @@ def batch_train(train_df, test_df, model, input_shape, vocab, epochs = 10, batch
         print 'Mean Validation Log Loss: {}'.format(np.mean(log_loss(y_test,y_pred)))
         print '\n \n'
 
-    return model, vocab
+    return model
 
 def grouper(iterable, n, fillvalue=None):
-    ''' helper function for batching '''
+    ''' helper function for batch selection '''
+
     args = [iter(iterable)] * n
     return izip_longest(*args, fillvalue=fillvalue)
 
 def save_nn(model, name):
-    # save as JSON
+    ''' Save neural net structure as json and weights as h5 '''
+
     json_string = model.to_json()
     open('/data/models/'+name+'_architecture.json', 'w').write(json_string)
 
@@ -71,7 +86,17 @@ def save_nn(model, name):
     pass
 
 def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/temp_imgs_bigger/vgg_imgs/', input_shape=(512,3,3), fits_in_memory = True):
-    ''' Train and save NN '''
+    ''' Train and save NN
+
+    Input:  (1) model arcitecture from build models
+            (2) file name to save model under
+            (3) image path of preporcessed image files, vgg_imgs or preprocessed_imgs
+            (4) shape of image data, (512,3,3) for vgg or (3,100,100) for preprocessed
+            (5) if false, model will be trained in batch to allow for training on more data than fits in memory
+
+    Output: (1) trained keras model
+
+    '''
 
     with open('/data/small_vocab.pkl', 'r') as fp:
         vocab = pickle.load(fp)
@@ -98,8 +123,8 @@ def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/
     save_nn(model, save_name)
     print save_name + ' has been saved'
 
-    return model, vocab
+    return model
 
 if __name__ == '__main__':
-    trained_model, words = train_net(model_function=build_MLP_net, save_name = 'MLP_full_batch', img_path = '/data/preprocessed_imgs/', input_shape = (3,100,100), fits_in_memory=False)
+    trained_model = train_net(model_function=build_MLP_net, save_name = 'MLP_full_batch', img_path = '/data/preprocessed_imgs/', input_shape = (3,100,100), fits_in_memory=False)
     # trained_model, vocab = train_net(save_name = 'VGG_full', img_path = '/data/vgg_imgs/')

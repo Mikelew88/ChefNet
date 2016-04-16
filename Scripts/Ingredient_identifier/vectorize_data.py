@@ -1,3 +1,5 @@
+''' This module vectorizes imgs and text for models. It also contains code that created a smaller vocabulary which only contains words that are seen more than 100 times in the data '''
+
 import sys
 
 sys.dont_write_bytecode = True
@@ -17,6 +19,16 @@ from collections import defaultdict
 from nltk.stem import WordNetLemmatizer
 
 from sklearn.preprocessing import MultiLabelBinarizer
+
+''' Image Processing '''
+
+def load_imgs(img_arrays, input_shape):
+    x, y, z = input_shape
+    X = np.empty((len(img_arrays),x,y,z))
+    for i, img in enumerate(img_arrays):
+        X[i,:,:,:] = np.load(img)
+
+    return X
 
 ''' Text processing '''
 
@@ -67,6 +79,7 @@ def clean_text(ingred_list):
 
 def vectorize_text(clean_text, vocab):
     ''' Vectorize multiple cleaned lists of ingredients '''
+
     y = np.zeros((len(clean_text), len(vocab)), dtype=np.bool)
     for i, text in enumerate(clean_text):
         for t, voc in enumerate(vocab):
@@ -75,6 +88,8 @@ def vectorize_text(clean_text, vocab):
     return y
 
 def create_small_vocab(y, vocab):
+    ''' Create a subset of the vocabulary with words that apear more than 100 times '''
+
     ingred_counts = np.sum(y, axis=0)
 
     small_vocab = []
@@ -93,12 +108,10 @@ def save_vocab(vocab, name):
         pickle.dump(vocab, f)
 
 
-
 def generate_wordcloud(word_cloud_text):
-    ''' Generate a simple word cloud of vocabulary '''
+    ''' Generate a simple word cloud of text '''
+
     from wordcloud import WordCloud
-
-
 
     # Generate a word cloud image
     wordcloud = WordCloud().generate(word_cloud_text)

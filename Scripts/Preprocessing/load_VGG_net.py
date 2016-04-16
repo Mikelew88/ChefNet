@@ -14,6 +14,7 @@ from skimage.io import imread
 sys.dont_write_bytecode = True
 
 def load_VGG_16(img_size, weights_path='../weights/vgg16_weights.h5'):
+    ''' Arcitecture from VGG-16, 2014 image net winner from Oxford '''
 
     img_width = img_size
     img_height = img_size
@@ -76,15 +77,15 @@ def load_VGG_16(img_size, weights_path='../weights/vgg16_weights.h5'):
     return model
 
 def get_activations(model, layer, X_batch):
+    ''' save second to last VGG activations for a batch of images
+
+    Input:  (1) keras Sequential model object
+            (2) integer of the layer to extract weights from
+            (3) 4D numpy array of all the X data you wish to extract activations for
+            
+    Output: (1) activations for that layer
     '''
-    Save second to last VGG activations for a batch of images
-    INPUT:
-        model = Keras Sequential model object
-        layer = integer of the layer to extract weights from
-        X_batch = 4D numpy array of all the X data you wish to extract activations for
-    OUTPUT:
-        numpy array: Activations for that layer
-    '''
+
     input_layer = model.layers[0].input
     specified_layer_output = model.layers[layer].get_output(train=False)
     theano_activation_fn = theano.function([input_layer],

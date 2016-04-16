@@ -27,12 +27,10 @@ from load_VGG_net import load_VGG_16, get_activations
 def create_df_image_key(df_in, dir_path):
     ''' Join ingredient lists to image locations, one to many
 
-    Input:
-        df_in = dataframe of unique recipes
-        dir_path = local path to image folder
+    Input:  (1) dataframe of unique recipes
+            (2) local path to image folder
 
-    Output:
-        DataFrame with one row for each image of a recipe
+    Output: (1) dataframe with one row for each image of a recipe
     '''
 
     # We must copy the ingredient vector for each distinct image for a single recipe
@@ -66,11 +64,9 @@ def load_imgs(img_arrays, input_shape):
 def preprocess_imgs(img_keys):
     ''' Save .jpgs arrays and VGG net decomposed arrays
 
-    Input:
-        Series of image paths
+    Input:  series of image paths
 
-    Output:
-        Array of vectorized images, and list of rows to drop due to bad images
+    Output: array of vectorized images, and list of rows to drop due to bad images
     '''
     img_size = 100
     base_path='/data/'
@@ -94,8 +90,7 @@ def preprocess_imgs(img_keys):
     pass
 
 def save_processed_imgs_to_disk(base_path='/data/'):
-    ''' Run on scraped images to create numpy arrays and VGG net processed data
-    '''
+    ''' Run on scraped images to create numpy arrays and VGG net processed data '''
     df = pd.read_csv(base_path+'recipe_data.csv')
     df.drop('Unnamed: 0', axis=1, inplace=True)
 
@@ -107,6 +102,8 @@ def save_processed_imgs_to_disk(base_path='/data/'):
     pass
 
 def find_unprocessed_imgs():
+    ''' Helper function to start preprecessing wherever stopped '''
+
     processed_dir = [x.split('.')[0] for x in os.listdir('/data/preprocessed_imgs/')]
     unprocessed_dir = [x.split('.')[0] for x in os.listdir('/data/Recipe_Images/')]
 

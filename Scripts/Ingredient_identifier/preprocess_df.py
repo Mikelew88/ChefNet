@@ -11,11 +11,10 @@ import itertools
 
 import cPickle as pickle
 
-from vectorize_text import clean_text
+from vectorize_data import clean_text
 
 def create_validation_set(df):
-    ''' Create set of recipes that will be set aside for validation
-    '''
+    ''' Create set of recipes that will be set aside for validation '''
     np.random.seed(seed=33)
     msk = np.random.rand(len(df), ) < 0.90
     train_df = df[msk]
@@ -28,12 +27,10 @@ def create_validation_set(df):
 def create_df_image_key(df_in, dir_path):
     ''' Join ingredient lists to image locations, one to many
 
-    Input:
-        df_in = dataframe of unique recipes
-        dir_path = local path to image folder
+    Input:  (1) dataframe of unique recipes
+            (2) local path to image folder
 
-    Output:
-        DataFrame with one row for each image of a recipe
+    Output: (1) dataframe with one row for each image of a recipe
     '''
 
     # We must copy the ingredient vector for each distinct image for a single recipe
@@ -54,17 +51,9 @@ def create_df_image_key(df_in, dir_path):
 
     return df_out
 
-''' Image Processing '''
-
-def load_imgs(img_arrays, input_shape):
-    x, y, z = input_shape
-    X = np.empty((len(img_arrays),x,y,z))
-    for i, img in enumerate(img_arrays):
-        X[i,:,:,:] = np.load(img)
-
-    return X
-
 def Save_Train_and_Test_df():
+    ''' save dfs to disk for training and testing '''
+
     df = pd.read_csv('/data/dfs/recipe_data.csv')
 
     df['clean_ingred'] = clean_text(df['ingred_list'])
@@ -77,6 +66,8 @@ def Save_Train_and_Test_df():
     with open('/data/dfs/test_df.pkl', 'w') as f:
         pickle.dump(test_df, f)
     pass
+
+
 
 if __name__ == '__main__':
     Save_Train_and_Test_df()

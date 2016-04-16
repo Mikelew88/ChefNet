@@ -26,8 +26,7 @@ from preprocess_data import create_validation_set, create_df_image_key, load_img
 from build_models import build_MLP_net, build_VGG_net, build_LSTM_net
 
 def batch_train(train_df, test_df, model, input_shape, word_indices, indices_word, word_keyword, epochs = 1, batch_size = 50):
-    ''' Since all images do not fit into memory, we must batch process ourselves
-    '''
+    ''' Since all images do not fit into memory, we must batch process ourselves '''
 
     for e in range(1,epochs+1):
         # Shuffle df rows for each epoch
@@ -73,17 +72,20 @@ def batch_train(train_df, test_df, model, input_shape, word_indices, indices_wor
 
 def grouper(iterable, n, fillvalue=None):
     ''' helper function for batching '''
+
     args = [iter(iterable)] * n
     return izip_longest(*args, fillvalue=fillvalue)
 
 def pickle_trained_nn(model, name):
     ''' Save Pickle of trained net '''
+
     with open('/data/models/'+name+'.pkl', 'w') as f:
         pickle.dump(model, f)
     pass
 
 def train_net(model_function=build_VGG_net, save_name = 'VGG_sigmoid'):
     ''' Train and save a VGG preprocessed net '''
+
     # max_classes=len(vocab)
     img_path = '/data/temp_imgs_bigger/vgg_imgs/'
     input_shape = (512,3,3)
