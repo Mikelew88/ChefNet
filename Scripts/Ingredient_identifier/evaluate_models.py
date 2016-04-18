@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import json
 
-from sklearn.metrics import log_loss, classification_report, confusion_matrix, f1_score
+from sklearn.metrics import log_loss, classification_report, precision_recall_fscore_support, f1_score
 
 from skimage.io import imread
 from skimage.transform import resize
@@ -132,22 +132,45 @@ def validation_metrics(model, vocab, input_shape, img_path, threshold = .5):
     #         y_pred_cats = make_cutoff(y_pred, t)
     #         print 'Threshold {}: {}'.format(t, np.mean(f1_score(y_true[:,i], y_pred_cats[:,i])))
 
-    y_pred_cats = make_cutoff(y_pred, .25)
+    y_pred_cats = make_cutoff(y_pred, threshold)
 
-    print classification_report(y_true,y_pred_cats, target_names=list(vocab))
+    # print classification_report(y_true,y_pred_cats, target_names=list(vocab))
 
-    print 'Average Log Loss Score: {}'.format(np.mean(log_loss(y_true,y_pred)))
+    # print 'Average Log Loss Score: {}'.format(np.mean(log_loss(y_true,y_pred)))
 
+    precision, recall, fbeta_score, support = precision_recall_fscore_support(y_true, y_pred_cats)
+
+    print 'Mean Recall: '
+    print np.mean(recall)
+    print
+    print 'Mean Precision: '
+    print np.mean(precision)
+
+
+    top_items(recall)
+    top_items(precision)
+
+    return y_true, y_pred_cats, precision, recall, fbeta_score, support
+
+def top_items(metric):
+    print 'Top ten categories for {}}:'.format(str(metric))
+
+    for n, i in enumerate(np.argsort(metric)[::-1]):
+        print '{}: {}'.format(metric[i], vocab[i])
 
 
 if __name__ == '__main__':
     df = pd.read_csv('/data/dfs/recipe_data.csv')
     # Other model: MLP_full_batch
-    model, vocab = load_model_and_vocab('VGG_full_dropout')
+    model, vocab = load_model_and_vocab('VGG_3_dropout')
 
     # Other folder: /data/preprocessed_imgs/
     # (512,3,3)
-    validation_metrics(model, vocab, (512,3,3), '/data/vgg_imgs/', .25)
+    y_true, y_pred_cats, precision, recall, fbeta_score, support = validation_metrics(model, vocab, (512,3,3), '/data/vgg_imgs/', .25)
+
+
+
+
     # img_array, img_id = load_preprocessed(8452, 4, 'vgg_imgs/')
     # write_img_caption(model, vocab, img_array, df, img_id = img_id, threshold=.3)
     #
