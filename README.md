@@ -25,14 +25,14 @@ It is critical that image labels are as cleans as possible, otherwise the neural
 
 ### Image Processing
 
-Neural networks were train with raw image data, and convolved imaged data that was passed though the 2014 image net winner, VGG-16 from Oxford. Transfer learning proved more fruitful given the limited size of my dataset. Activations were taken at the end of layer 30, before flattening to dense layers. It would be interesting to compare results using activations taken after these dense layers, but I did not have time to explore this comparison. 
+Neural networks were trained with raw image data, and convolved imaged data that was passed though the 2014 image net winner, VGG-16 from Oxford. Transfer learning proved more fruitful given the limited size of my dataset. Activations were taken at the end of layer 30, before flattening to dense layers. It would be interesting to compare results using activations taken after these dense layers, but I did not have time to explore this comparison.
 
 Images were downsized to 100x100 so that I could iterate through training multiple models, in the time allotted for capstone projects.
 
 ### Neural Network Architecture
 
-
+My architecture went though multiple iterations, ultimately I settled on preprocessing images with VGG-16, and passing those activations into 3 hidden dense layers. My output layer consists of a sigmoid activation for each ingredient, and uses binary crossentropy loss.
 
 ### Thank you
 
-Big thank you to Jesse Lieman-Sifry for inspiring this idea, as well as to my Galvanize Instructors and peers for continuous help and suggestions along the way. It was a pleasure to work with all of you.
+Big thank you to Jesse Lieman-Sifry for the inspiration behind this project, as well as to my Galvanize Instructors and peers for the continuous help and suggestions along the way. It was a pleasure to work with all of you.

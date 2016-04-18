@@ -147,15 +147,16 @@ def validation_metrics(model, vocab, input_shape, img_path, threshold = .5):
     print np.mean(precision)
 
 
-    top_items(recall)
-    top_items(precision)
+    top_items(recall, 'recall')
+    print
+    top_items(precision, 'precision')
 
     return y_true, y_pred_cats, precision, recall, fbeta_score, support
 
-def top_items(metric):
-    print 'Top ten categories for {}}:'.format(str(metric))
+def top_items(metric, name):
+    print 'Top ten categories for {}:'.format(name)
 
-    for n, i in enumerate(np.argsort(metric)[::-1]):
+    for i in np.argsort(metric)[-10:]:
         print '{}: {}'.format(metric[i], vocab[i])
 
 
