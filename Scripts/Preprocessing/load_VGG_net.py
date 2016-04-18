@@ -14,7 +14,7 @@ from skimage.io import imread
 sys.dont_write_bytecode = True
 
 def load_VGG_16(img_size, weights_path='../weights/vgg16_weights.h5'):
-    ''' Arcitecture from VGG-16, 2014 image net winner from Oxford '''
+    ''' Arcitecture from VGG-16, 2014 image net winner from Oxford, source: https://gist.github.com/baraldilorenzo/07d7802847aaad0a35d3 '''
 
     img_width = img_size
     img_height = img_size
@@ -82,7 +82,7 @@ def get_activations(model, layer, X_batch):
     Input:  (1) keras Sequential model object
             (2) integer of the layer to extract weights from
             (3) 4D numpy array of all the X data you wish to extract activations for
-            
+
     Output: (1) activations for that layer
     '''
 

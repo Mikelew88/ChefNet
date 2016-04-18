@@ -74,15 +74,8 @@ def train_LSTM():
 
     model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
 
-
-    def sample(a, temperature=1.0):
-        # helper function to sample an index from a probability array
-        a = np.log(a) / temperature
-        a = np.exp(a) / np.sum(np.exp(a))
-        return np.argmax(np.random.multinomial(1, a, 1))
-
     # train the model, output generated text after each iteration
-    for iteration in range(1, 60):
+    for iteration in range(1, 3):
         print()
         print('-' * 50)
         print('Iteration', iteration)
@@ -120,6 +113,12 @@ def train_LSTM():
             print()
         return model
 
+def sample(a, temperature=1.0):
+    # helper function to sample an index from a probability array
+    a = np.log(a) / temperature
+    a = np.exp(a) / np.sum(np.exp(a))
+    return np.argmax(np.random.multinomial(1, a, 1))
+
 def save_nn(model, name):
     # save as JSON
     json_string = model.to_json()
@@ -129,5 +128,8 @@ def save_nn(model, name):
     pass
 
 if __name__ == '__main__':
+    print('Training...')
     model = train_LSTM()
+
+    print('Saving...')
     save_nn(model, 'LSTM_Recipe_Gen')

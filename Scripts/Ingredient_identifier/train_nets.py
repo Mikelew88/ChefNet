@@ -98,7 +98,7 @@ def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/
 
     '''
 
-    with open('/data/small_vocab.pkl', 'r') as fp:
+    with open('/data/vocab/small_vocab.pkl', 'r') as fp:
         vocab = pickle.load(fp)
 
     with open('/data/dfs/train_df.pkl', 'r') as f:
@@ -114,11 +114,14 @@ def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/
 
     if fits_in_memory:
         print 'Loading data... '
+        X_train = load_imgs(train_df_expanded['img_path'], input_shape)
+        y_train = vectorize_text(train_df_expanded['clean_ingred'], vocab)
+
         X_test = load_imgs(test_df_expanded['img_path'], input_shape)
         y_test = vectorize_text(test_df_expanded['clean_ingred'], vocab)
-        model.fit(X_train, y_train, nb_epoch=10, validation_data = (X_test, y_test))
+        model.fit(X_train, y_train, nb_epoch=25, validation_data = (X_test, y_test))
     else:
-        trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, vocab, epochs=10, batch_size=64)
+        trained_model = batch_train(train_df_expanded, test_df_expanded, model, input_shape, vocab, epochs=25, batch_size=64)
 
     save_nn(model, save_name)
     print save_name + ' has been saved'
@@ -126,5 +129,5 @@ def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/
     return model
 
 if __name__ == '__main__':
-    trained_model = train_net(model_function=build_MLP_net, save_name = 'MLP_full_batch', img_path = '/data/preprocessed_imgs/', input_shape = (3,100,100), fits_in_memory=False)
-    # trained_model, vocab = train_net(save_name = 'VGG_full', img_path = '/data/vgg_imgs/')
+    # trained_model = train_net(model_function=build_MLP_net, save_name = 'dumb_net', img_path = '/data/preprocessed_imgs/', input_shape = (3,100,100), fits_in_memory=False)
+    trained_model = train_net(save_name = 'VGG_3_dropout', img_path = '/data/vgg_imgs/')

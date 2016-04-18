@@ -16,8 +16,7 @@ def build_MLP_net(nb_classes, input_shape):
 
     model = Sequential()
 
-    model.add(Convolution2D(32, 3, 3, border_mode='same',
-                        input_shape=input_shape))
+    model.add(Convolution2D(32, 3, 3, border_mode='same', input_shape=input_shape))
     model.add(Activation('relu'))
     model.add(Convolution2D(32, 3, 3))
     model.add(Activation('relu'))
@@ -56,14 +55,19 @@ def build_VGG_net(nb_classes, input_shape):
     # model.add(Activation('relu'))
     # model.add(Convolution2D(32, 3, 3))
     model.add(Activation('relu'))
-    # model.add(Dropout(0.25))
+    model.add(Dropout(0.25))
 
     model.add(Flatten())
+    model.add(Dense(4608))
+    model.add(Activation('relu'))
+    model.add(Dropout(0.25))
+    model.add(Dense(4608))
+    model.add(Activation('relu'))
+    model.add(Dropout(0.25))
     model.add(Dense(1000))
     model.add(Activation('relu'))
-    model.add(Dense(1000))
-    model.add(Activation('relu'))
-    # model.add(Dropout(0.25))
+    model.add(Dropout(0.25))
+
     model.add(Dense(nb_classes))
     model.add(Activation('sigmoid'))
 

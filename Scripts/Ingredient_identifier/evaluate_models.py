@@ -143,7 +143,7 @@ def validation_metrics(model, vocab, input_shape, img_path, threshold = .5):
 if __name__ == '__main__':
     df = pd.read_csv('/data/dfs/recipe_data.csv')
     # Other model: MLP_full_batch
-    model, vocab = load_model_and_vocab('VGG_full')
+    model, vocab = load_model_and_vocab('VGG_full_dropout')
 
     # Other folder: /data/preprocessed_imgs/
     # (512,3,3)
