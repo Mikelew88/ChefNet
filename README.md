@@ -48,7 +48,7 @@ First you will need to install some dependencies, in addition to Conda:
 
 * [HDF5](http://docs.h5py.org/en/latest/build.html)
 
-You will also need to download the weights of trained VGG-16 and place the .h5 file in the [VGG Weights](#/vgg_weights) folder.
+You will also need to download the weights of trained VGG-16 and place the .h5 file in the [VGG Weights](/vgg_weights) folder.
 weights: [vgg16_weights.h5](https://drive.google.com/file/d/0Bz7KyqmuGsilT0J5dmRCM0ROVHc/view)
 
 ### Thank you
