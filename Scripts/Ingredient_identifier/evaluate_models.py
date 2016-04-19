@@ -30,7 +30,7 @@ from load_VGG_net import load_VGG_16, get_activations
 
 def load_model_and_vocab(model_name):
     ''' Load pickled model and list of words '''
-    base_dir = '/data/'
+    base_dir = '../../'
 
     model = model_from_json(open(base_dir+'models/'+model_name+'_architecture.json').read())
     model.load_weights(base_dir+'models/'+model_name+'_weights.h5')
@@ -89,7 +89,7 @@ def load_jpg(img_path, vgg=True):
     img = np.swapaxes(img, 0, 2)
     img = np.swapaxes(img, 1, 2)
     if vgg:
-        model = load_VGG_16(img_x, '/data/weights/vgg16_weights.h5')
+        model = load_VGG_16(img_x, '../../weights/vgg16_weights.h5')
 
         img_array = np.empty((1, 3, img_x, img_y))
         img_array[0,:,:,:] = img
@@ -204,7 +204,7 @@ def random_simulation(y_true):
 if __name__ == '__main__':
     # df = pd.read_csv('/data/dfs/recipe_data.csv')
     # Other model: MLP_full_batch
-    model, vocab = load_model_and_vocab('VGG_3_dropout')
+    model, vocab = load_model_and_vocab('VGG_full_dropout')
 
     # Other folder: /data/preprocessed_imgs/
     # (512,3,3)
@@ -221,5 +221,5 @@ if __name__ == '__main__':
     #
     # print '\n'
     #
-    img_array = load_jpg('/data/lunch_monday.jpg', (100,100))
+    img_array = load_jpg('../../images/lunch_monday.jpg', (100,100))
     write_img_caption(model, vocab, img_array, threshold=.25)
