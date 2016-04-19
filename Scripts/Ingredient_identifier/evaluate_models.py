@@ -99,7 +99,7 @@ def load_jpg(img_path, vgg=True):
     img = np.swapaxes(img, 0, 2)
     img = np.swapaxes(img, 1, 2)
     if vgg:
-        model = load_VGG_16(img_x, '../../weights/vgg16_weights.h5')
+        model = load_VGG_16(img_x, '../../vgg_weights/vgg16_weights.h5')
 
         img_array = np.empty((1, 3, img_x, img_y))
         img_array[0,:,:,:] = img

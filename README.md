@@ -39,9 +39,9 @@ Images were downsized to 100x100 so that I could iterate through training multip
 
 My architecture went though multiple iterations, ultimately I settled on preprocessing images with VGG-16, and passing those activations into 3 hidden dense layers. My output layer consists of a sigmoid activation for each ingredient, and uses binary crossentropy loss.
 
-### Use it yourself
+### Try out ChefNet yourself
 
-First you will need to install some dependencies, in addition to Conda:
+First you will need to install these dependencies, in addition to Conda:
 
 * [Keras](http://keras.io/)
 
@@ -49,11 +49,13 @@ First you will need to install some dependencies, in addition to Conda:
 
 * [HDF5](http://docs.h5py.org/en/latest/build.html)
 
-You will need to download the weights of my trained convolutional neural net and place the .h5 in the [Models](/models) folder: [CNN Weights](https://drive.google.com/file/d/0B53_Ht6DdCsGMy1GTDkwR0piODg/view?usp=sharing)
+You will need to download the weights of my trained convolutional neural net and place the .h5 in the [Models](/models) folder
+
+My weights: [CNN Weights](https://drive.google.com/file/d/0B53_Ht6DdCsGMy1GTDkwR0piODg/view?usp=sharing)
 
 You will also need to download the weights of trained VGG-16 and place the .h5 file in the [VGG Weights](/vgg_weights) folder.
 
-weights: [vgg16_weights.h5](https://drive.google.com/file/d/0Bz7KyqmuGsilT0J5dmRCM0ROVHc/view)
+VGG-16 weights: [vgg16_weights.h5](https://drive.google.com/file/d/0Bz7KyqmuGsilT0J5dmRCM0ROVHc/view)
 
 Next you should move any image file you would like to predict on into the [images](/images) folder.
 
