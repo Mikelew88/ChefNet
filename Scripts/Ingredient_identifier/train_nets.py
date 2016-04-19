@@ -16,7 +16,7 @@ import cPickle as pickle
 from vectorize_data import clean_text, vectorize_text, load_imgs
 from preprocess_df import create_validation_set, create_df_image_key
 
-from build_models import build_MLP_net, build_VGG_net, build_LSTM_net
+from build_models import build_MLP_net, build_VGG_net, build_LSTM_net, build_random
 
 def batch_train(train_df, test_df, model, input_shape, vocab, epochs = 10, batch_size = 50, print_loss=False):
     ''' Batch processing for when images don't all fit in memory
@@ -128,6 +128,24 @@ def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/
 
     return model
 
+def random_simulation():
+    with open('/data/vocab/small_vocab.pkl', 'r') as fp:
+        vocab = pickle.load(fp)
+
+    with open('/data/dfs/train_df.pkl', 'r') as f:
+        train_df = pickle.load(f)
+
+    X_train = train_df['id']
+    y_train = vectorize_text(train_df['clean_ingred'], vocab)
+
+    model = build_random(len(vocab))
+    model.fit(X_train, y_train)
+    save_nn(model, 'random_simulation')
+    return model
+
+
 if __name__ == '__main__':
     # trained_model = train_net(model_function=build_MLP_net, save_name = 'dumb_net', img_path = '/data/preprocessed_imgs/', input_shape = (3,100,100), fits_in_memory=False)
-    trained_model = train_net(save_name = 'VGG_3_dropout', img_path = '/data/vgg_imgs/')
+    # trained_model = train_net(save_name = 'VGG_3_dropout', img_path = '/data/vgg_imgs/')
+
+    random = random_simulation()

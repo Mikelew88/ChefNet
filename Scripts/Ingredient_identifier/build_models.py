@@ -129,3 +129,14 @@ def build_RNN(nb_classes, input_shape, max_caption_len):
     model.add(Activation('softmax'))
 
     model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
+
+def build_random(nb_classes):
+
+        model = Sequential()
+
+        model.add(Dense(1))
+        model.add(Dense(nb_classes))
+        model.add(Activation('sigmoid'))
+
+        model.compile(loss='binary_crossentropy', optimizer=Adam())
+        return model

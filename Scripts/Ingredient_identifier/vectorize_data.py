@@ -11,6 +11,11 @@ import numpy as np
 import operator
 import itertools
 import indicoio
+import matplotlib
+# This allows me to plot on AWS
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
 
 import cPickle as pickle
 
@@ -18,7 +23,8 @@ from collections import defaultdict
 
 from nltk.stem import WordNetLemmatizer
 
-from sklearn.preprocessing import MultiLabelBinarizer
+from wordcloud import WordCloud
+
 
 ''' Image Processing '''
 
@@ -93,14 +99,12 @@ def create_small_vocab(y, vocab):
     ingred_counts = np.sum(y, axis=0)
 
     small_vocab = []
-    word_cloud_text = ''
 
     for i, vocab in zip (ingred_counts, vocab):
         if i > 100 and vocab:
             small_vocab.append(vocab)
-            word_cloud_text.join(' '+vocab*i)
 
-    return small_vocab, word_cloud_text
+    return small_vocab
 
 
 def save_vocab(vocab, name):
@@ -108,38 +112,39 @@ def save_vocab(vocab, name):
         pickle.dump(vocab, f)
 
 
-def generate_wordcloud(word_cloud_text):
+def generate_wordcloud(y, vocab):
     ''' Generate a simple word cloud of text '''
+    ingred_counts = np.sum(y, axis=0)
 
-    from wordcloud import WordCloud
+    word_cloud_text = []
+
+    for i, vocab in zip(ingred_counts, vocab):
+        word_cloud_text.append((str(vocab),int(i)))
 
     # Generate a word cloud image
-    wordcloud = WordCloud().generate(word_cloud_text)
+    wordcloud = WordCloud(background_color = "white")
 
-    # Display the generated image:
-    # the matplotlib way:
-    import matplotlib.pyplot as plt
-    plt.imshow(wordcloud)
-    plt.axis("off")
+    wordcloud.fit_words(word_cloud_text)
 
-    # take relative word frequencies into account, lower max_font_size
-    wordcloud = WordCloud(max_font_size=40, relative_scaling=.5).generate(word_cloud_text)
-    plt.figure()
     plt.imshow(wordcloud)
-    plt.axis("off")
-    plt.show()
+    plt.axis('off')
+    plt.savefig('../../figures/vocab_wordcloud.png')
+    pass
 
 
 if __name__ == '__main__':
 
-    with open('/data/el_vocab_4_14.pkl', 'r') as fp:
-        vocab = pickle.load(fp)
-
-    df = pd.read_csv('/data/recipe_data.csv')
-    # vectorizer, words = vectorize_text(df['ingred_list'], 1000)
-    text_list = clean_text_basic(df['ingred_list'])
-    y = vectorize_text(text_list, vocab)
-
-    small_vocab, word_cloud_text = create_small_vocab(y, vocab)
-
-    save_vocab(small_vocab, 'small_vocab')
+    # with open('/data/vocab/small_vocab.pkl', 'r') as fp:
+    #     vocab = pickle.load(fp)
+    #
+    # df = pd.read_csv('/data/dfs/recipe_data.csv')
+    # # vectorizer, words = vectorize_text(df['ingred_list'], 1000)
+    # text_list = clean_text(df['ingred_list'])
+    # y = vectorize_text(text_list, vocab)
+    # #
+    # # small_vocab, word_cloud_text = create_small_vocab(y, vocab)
+    # #
+    # # save_vocab(small_vocab, 'small_vocab')
+    #
+    # # generate_wordcloud(y, vocab)
+    pass
