@@ -25,12 +25,14 @@ from keras.models import model_from_json
 from vectorize_data import vectorize_text, load_imgs
 from preprocess_df import create_df_image_key
 
+from build_models import build_VGG_net
+
 sys.path.append('../Preprocessing')
 from load_VGG_net import load_VGG_16, get_activations
 
 def load_model_and_vocab(model_name):
     ''' Load pickled model and list of words '''
-    base_dir = '../../'
+    base_dir = '/data/'
 
     model = model_from_json(open(base_dir+'models/'+model_name+'_architecture.json').read())
     model.load_weights(base_dir+'models/'+model_name+'_weights.h5')
@@ -44,11 +46,16 @@ def write_img_caption(model, vocab, img_arr, df=None, img_id=None, threshold=.5)
     ''' Predict words in an img '''
 
     preds = model.predict(img_arr, verbose=0)[0]
+    # preds =
 
     if img_id:
         print 'Recipe Number: ' + str(img_id)
 
-    pred_index = np.where(preds > threshold)[0]
+    pred_index = np.argsort(preds)[::-1]
+    print '______________________'
+    print
+    print 'ChefNet Predictions: '
+    print
 
     generated = ''
 
@@ -56,16 +63,19 @@ def write_img_caption(model, vocab, img_arr, df=None, img_id=None, threshold=.5)
 
         next_word = vocab[next_index]
 
+        if preds[next_index]<threshold:
+            break
+
         if generated == '':
             generated += next_word
             sys.stdout.write(next_word)
-            sys.stdout.write(' (' + str(round(preds[next_index]*100)) + '%)')
+            sys.stdout.write(' (' + str(int(round(preds[next_index]*100))) + '%)')
 
         else:
             generated += ', '+next_word
             sys.stdout.write(', ')
             sys.stdout.write(next_word)
-            sys.stdout.write(' (' + str(round(preds[next_index]*100)) + '%)')
+            sys.stdout.write(' (' + str(int(round(preds[next_index]*100))) + '%)')
 
         sys.stdout.flush()
 
@@ -204,7 +214,6 @@ def random_simulation(y_true):
 if __name__ == '__main__':
     # df = pd.read_csv('/data/dfs/recipe_data.csv')
     # Other model: MLP_full_batch
-    model, vocab = load_model_and_vocab('VGG_full_dropout')
 
     # Other folder: /data/preprocessed_imgs/
     # (512,3,3)
@@ -221,5 +230,4 @@ if __name__ == '__main__':
     #
     # print '\n'
     #
-    img_array = load_jpg('../../images/lunch_monday.jpg', (100,100))
-    write_img_caption(model, vocab, img_array, threshold=.25)
+    pass

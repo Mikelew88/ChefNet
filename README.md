@@ -23,7 +23,7 @@ To create a labeled dataset of images of food, I scraped the recipes and user su
 ### Ingredient label wrangling
 
 ![](figures/vocab_wordcloud.png)
-<img src="figures/vocab_wordcloud.png" width="250">
+<!-- <img src="figures/vocab_wordcloud.png" width="250"> -->
 
 In order to train a neural net, I needed to create consistent labels for ingredients. I took two approaches. My first approach was to start with the scraped list of ingredients, and identify the keyword using the indico keyword extraction api, while iteratively remove all words not critical to the underlying food item. My second approach, which I ultimately used to train my net, was to start with a cleaned list of ingredients initially scraped from   enchantedlearning.com
 
@@ -50,7 +50,14 @@ First you will need to install some dependencies, in addition to Conda:
 * [HDF5](http://docs.h5py.org/en/latest/build.html)
 
 You will also need to download the weights of trained VGG-16 and place the .h5 file in the [VGG Weights](/vgg_weights) folder.
+
 weights: [vgg16_weights.h5](https://drive.google.com/file/d/0Bz7KyqmuGsilT0J5dmRCM0ROVHc/view)
+
+Next you should move any image file you would like to predict on into the [images](/images) folder.
+
+Now you can run [predict_ingredients.py](/Scripts/Ingredient_identifier) to have the model make your predictions (make sure you run from the [ingredient identifier](/Scripts/Ingredient_identifier)).
+
+If you run the script in ipython, you may just run '''predict_user_photo(model, vocab)''' to predict additional photos without reloading the model.
 
 ### Thank you
 
