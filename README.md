@@ -4,10 +4,13 @@ Here you may find my Galvanize Capstone Project.
 
 __Outline__
 
-* [Data](#data-wrangling)
+* [Data](#data)
 * [Ingredient Categorization](#ingredient-label-wrangling)
 * [Image Processing](#image-processing)
-* [Neural Network Architecture](#neral-network-architecture)
+* [Neural Network Architecture](#neural-network-architecture)
+* [References](#references)
+
+
 
 ### Motivation
 
@@ -18,6 +21,8 @@ What can we teach computer's about food? ChefNet is a convolutional neural netwo
 To create a labeled dataset of images of food, I scraped the recipes and user submitted photos of 17,000 recipes, totaling 230,000 user photos, from allrecipes.com. The scraper was run on an AWS instance and took about a day to run, massive speedups may be attributed to parallelizing and threading the scraping process. Code is in the __Web_scrapers__ folder under Scripts.
 
 ### Ingredient label wrangling
+
+![alt text](figures/vocab_wordcloud.png "Labels")
 
 In order to train a neural net, I needed to create consistent labels for ingredients. I took two approaches. My first approach was to start with the scraped list of ingredients, and identify the keyword using the indico keyword extraction api, while iteratively remove all words not critical to the underlying food item. My second approach, which I ultimately used to train my net, was to start with a cleaned list of ingredients initially scraped from   enchantedlearning.com
 
@@ -36,3 +41,10 @@ My architecture went though multiple iterations, ultimately I settled on preproc
 ### Thank you
 
 Big thank you to Jesse Lieman-Sifry for the inspiration behind this project, as well as to my Galvanize Instructors and peers for the continuous help and suggestions along the way. It was a pleasure to work with all of you.
+
+### References
+
+* VGG Net Representation
+```Very Deep Convolutional Networks for Large-Scale Image Recognition
+K. Simonyan, A. Zisserman
+arXiv:1409.1556```
