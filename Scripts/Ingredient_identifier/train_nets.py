@@ -129,6 +129,8 @@ def train_net(model_function=build_VGG_net, save_name = 'test', img_path='/data/
     return model
 
 def random_simulation():
+    ''' Randomly assign labels to see how random guessing would perform '''
+
     with open('/data/vocab/small_vocab.pkl', 'r') as fp:
         vocab = pickle.load(fp)
 
