@@ -38,6 +38,19 @@ Images were downsized to 100x100 so that I could iterate through training multip
 
 My architecture went though multiple iterations, ultimately I settled on preprocessing images with VGG-16, and passing those activations into 3 hidden dense layers. My output layer consists of a sigmoid activation for each ingredient, and uses binary crossentropy loss.
 
+### Use it yourself
+
+First you will need to install some dependencies, in addition to Conda:
+
+* [Keras](http://keras.io/)
+
+* [Skimage](http://scikit-image.org/)
+
+* [HDF5](http://docs.h5py.org/en/latest/build.html)
+
+You will also need to download the weights of trained VGG-16 and place the .h5 file in the [VGG Weights](#/vgg_weights) folder.
+weights: [vgg16_weights.h5](https://drive.google.com/file/d/0Bz7KyqmuGsilT0J5dmRCM0ROVHc/view)
+
 ### Thank you
 
 Big thank you to Jesse Lieman-Sifry for the inspiration behind this project, as well as to my Galvanize Instructors and peers for the continuous help and suggestions along the way. It was a pleasure to work with all of you.
