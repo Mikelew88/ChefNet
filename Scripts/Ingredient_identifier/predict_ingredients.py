@@ -23,11 +23,11 @@ def predict_user_photo(model, vocab):
 
     try:
         img_array = load_jpg('../../images/'+file_name)
+        write_img_caption(model, vocab, img_array, threshold=.25)
     except:
         print 'Please enter a valid file name, make sure to include filetype, .jpg for example'
         predict_user_photo(model, vocab)
-
-    write_img_caption(model, vocab, img_array, threshold=.25)
+        break
     pass
 
 if __name__ == '__main__':

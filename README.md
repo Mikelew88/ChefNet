@@ -61,7 +61,7 @@ Next you should move any image file you would like to predict on into the [image
 
 Now you can run [predict_ingredients.py](/Scripts/Ingredient_identifier) to have the model make your predictions (make sure you run from the [ingredient identifier](/Scripts/Ingredient_identifier)).
 
-If you run the script in ipython, you may just run '''predict_user_photo(model, vocab)''' to predict additional photos without reloading the model.
+If you run the script in ipython, you may just run `predict_user_photo(model, vocab)` to predict additional photos without reloading the model.
 
 ### Thank you
 
