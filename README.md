@@ -22,8 +22,8 @@ To create a labeled dataset of images of food, I scraped the recipes and user su
 
 ### Ingredient label wrangling
 
-![](figures/vocab_wordcloud.png)
-<!-- <img src="figures/vocab_wordcloud.png" width="250"> -->
+<!-- ![](figures/vocab_wordcloud.png) -->
+<img src="figures/vocab_wordcloud.png" width="250">
 
 In order to train a neural net, I needed to create consistent labels for ingredients. I took two approaches. My first approach was to start with the scraped list of ingredients, and identify the keyword using the indico keyword extraction api, while iteratively remove all words not critical to the underlying food item. My second approach, which I ultimately used to train my net, was to start with a cleaned list of ingredients initially scraped from   enchantedlearning.com
 
@@ -48,6 +48,8 @@ First you will need to install some dependencies, in addition to Conda:
 * [Skimage](http://scikit-image.org/)
 
 * [HDF5](http://docs.h5py.org/en/latest/build.html)
+
+You will need to download the weights of my trained convolutional neural net and place the .h5 in the [Models](/models) folder: [CNN Weights](https://drive.google.com/file/d/0B53_Ht6DdCsGMy1GTDkwR0piODg/view?usp=sharing)
 
 You will also need to download the weights of trained VGG-16 and place the .h5 file in the [VGG Weights](/vgg_weights) folder.
 
