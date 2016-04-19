@@ -61,9 +61,9 @@ Below represents the top classes in terms of Precision (top 10 range form 60%-10
 
 Here are some examples of how it predicted
 
-<img src="images/Carrot_cake_slide.png" width="400">
+<img src="images/Carrot_cake_slide.png" width="">
 
-<img src="images/Monday_Lunch_slide.png" width="400">
+<img src="images/Monday_Lunch_slide.png" width="">
 
 ### Try out ChefNet yourself
 
@@ -96,7 +96,7 @@ Here is an example of how it should look:
 
 The data is not perfect, below is a slide that shows two different images for the same recipe. Not only can the sugar cookie look completely different based on the decoration decisions, but there are also misplaced pictures:
 
-<img src="images/User_imgs.png" width="400">
+<img src="images/User_imgs.png" width="">
 
 ### Next Steps
 
