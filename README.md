@@ -22,7 +22,7 @@ To create a labeled dataset of images of food, I scraped the recipes and user su
 
 ### Ingredient label wrangling
 
-![](figures/vocab_wordcloud.png =100x100 "Labels")
+![](figures/vocab_wordcloud.png =100x100)
 
 In order to train a neural net, I needed to create consistent labels for ingredients. I took two approaches. My first approach was to start with the scraped list of ingredients, and identify the keyword using the indico keyword extraction api, while iteratively remove all words not critical to the underlying food item. My second approach, which I ultimately used to train my net, was to start with a cleaned list of ingredients initially scraped from   enchantedlearning.com
 
