@@ -63,6 +63,10 @@ Now you can run [predict_ingredients.py](/Scripts/Ingredient_identifier) to have
 
 If you run the script in ipython, you may just run `predict_user_photo(model, vocab)` to predict additional photos without reloading the model.
 
+Here is an example of how it should look:
+<img src="images/demo.png" width="250">
+
+
 ### Thank you
 
 Big thank you to Jesse Lieman-Sifry for the inspiration behind this project, as well as to my Galvanize Instructors and peers for the continuous help and suggestions along the way. It was a pleasure to work with all of you.
