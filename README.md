@@ -3,7 +3,6 @@
 What can we teach computer's about food? ChefNet is a convolutional neural network that identifies the ingredients in a dish by analyzing a picture of it.
 
 <img src="images/carrot_cake.jpg" width="300">
-
 <br><br>
 
 __Outline__
@@ -38,7 +37,6 @@ It is critical that image labels are as cleans as possible, otherwise the neural
 Neural networks were trained with raw image data, and convolved imaged data that was passed though the 2014 image net winner, VGG-16 from Oxford. Transfer learning proved more fruitful given the limited size of my dataset. Activations were taken at the end of layer 30, before flattening to dense layers. It would be interesting to compare results using activations taken after these dense layers, but I did not have time to explore this comparison. Here is a rough illustration of how the image vectorization process:
 
 <img src="figures/image_vectorization.png" width="">
-
 <br><br>
 
 Images were downsized to 100x100 so that I could iterate through training multiple models, in the time allotted for capstone projects.
