@@ -49,13 +49,13 @@ My architecture went though multiple iterations, ultimately I settled on preproc
 
 All neural network architectures may be found in [this code](/Scripts/Ingredient_identifier/build_models.py).
 
-# Results
+# Results ([Code](/Scripts/Ingredient_identifier/evaluate_models.py))
 
-Overall the model had weighted Recall of 48% and Precision of 38%. Without VGG-16 transfer learning Recall was 46% and Precision was 35%.
+__ChefNet:__ 48% Recall, 38% Precision
+__ChefNet without VGG-16 Processiong:__ 46% Recall, 35% Precision
+__Random simulation with simulated classes:__ 23% Recall, 6% Precision
 
-These metrics can be compared to a set of random predictions, with a similar number of true predictions as the model, and that had a Recall of 23% and Precision of 6%.
-
-Below you may see what classes had best Recall (top 10 ranged from 75%-100%), similar to the frequecy of words:
+Below you may see what classes had best Recall (top 10 ranged from 75%-100%), similar to the frequency of words:
 
 <img src="figures/recall_wordcloud.png" width="600">
 
@@ -128,6 +128,8 @@ Separate from the ingredient identifier, I've also developed a model that will g
 * banana, lemon juice, cream mushroom soup, milk, cheese sauce
 
 * garlic, cheese, cheddar cheese, salt, cheese, sausage, garlic, pork, bacon hotme, chicken, sesame, asparagus, bread, cheese, bacon, hamburger bun
+
+You may notice __bacon hotme__ is not an actual ingredient. This is an odd result that can come out of character by character text generation. 
 
 My code for this maybe found in [Recipe Generation RNN](Scripts/Recipe_Generation_RNN)
 
