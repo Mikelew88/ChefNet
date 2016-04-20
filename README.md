@@ -35,7 +35,7 @@ In order to train a neural net, I needed to create consistent labels for ingredi
 
 It is critical that image labels are as cleans as possible, otherwise the neural network will have difficulty learning. It was also important to allow the model to have multi-word labels to represent items such as bell pepper. A useful extension of this project may be to vectorize the labels, so that the net will learn that the ingredient similarity, for example, misclassifying beef and steak is closer than chicken and peas. Vectorization methods require tokenization of text first. This may be an area worth explore further.
 
-### Image Processing
+### Image Processing ([Code](/Scripts/Preprocessing))
 
 Neural networks were trained with raw image data, and convolved imaged data that was passed though the 2014 image net winner, VGG-16 from Oxford. Transfer learning proved more fruitful given the limited size of my dataset. Activations were taken at the end of layer 30, before flattening to dense layers. It would be interesting to compare results using activations taken after these dense layers, but I did not have time to explore this comparison. Here is a rough illustration of how the image vectorization process:
 
@@ -44,13 +44,9 @@ Neural networks were trained with raw image data, and convolved imaged data that
 
 Images were downsized to 100x100 so that I could iterate through training multiple models, in the time allotted for capstone projects.
 
-Preprocessing scripts may be found in the [Preprocessing folder](/Scripts/Preprocessing)
-
-### Neural Network Architecture
+### Neural Network Architecture ([Code](/Scripts/Preprocessing))
 
 My architecture went though multiple iterations, ultimately I settled on preprocessing images with VGG-16, and passing those activations into 3 hidden dense layers. My output layer consists of a sigmoid activation for each ingredient, and uses binary crossentropy loss.
-
-All neural network architectures may be found in [this code](/Scripts/Ingredient_identifier/build_models.py).
 
 # Results
 
@@ -141,7 +137,7 @@ Separate from the ingredient identifier, I've also developed a model that will g
 
 You may notice __bacon hotme__ is not an actual ingredient. This is an odd result that can come out of character by character text generation.
 
-My code for this maybe found in [Recipe Generation RNN](Scripts/Recipe_Generation_RNN)
+All scripts for this maybe found in [Recipe Generation RNN](Scripts/Recipe_Generation_RNN).
 
 # Thank you
 
