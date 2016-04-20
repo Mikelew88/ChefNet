@@ -52,7 +52,9 @@ All neural network architectures may be found in [this code](/Scripts/Ingredient
 # Results ([Code](/Scripts/Ingredient_identifier/evaluate_models.py))
 
 __ChefNet:__ 48% Recall, 38% Precision
+
 __ChefNet without VGG-16 Processiong:__ 46% Recall, 35% Precision
+
 __Random simulation with simulated classes:__ 23% Recall, 6% Precision
 
 Below you may see what classes had best Recall (top 10 ranged from 75%-100%), similar to the frequency of words:
@@ -129,7 +131,7 @@ Separate from the ingredient identifier, I've also developed a model that will g
 
 * garlic, cheese, cheddar cheese, salt, cheese, sausage, garlic, pork, bacon hotme, chicken, sesame, asparagus, bread, cheese, bacon, hamburger bun
 
-You may notice __bacon hotme__ is not an actual ingredient. This is an odd result that can come out of character by character text generation. 
+You may notice __bacon hotme__ is not an actual ingredient. This is an odd result that can come out of character by character text generation.
 
 My code for this maybe found in [Recipe Generation RNN](Scripts/Recipe_Generation_RNN)
 
