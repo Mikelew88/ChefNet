@@ -12,9 +12,9 @@ __Outline__
 * [Try out ChefNet yourself](#Try-out-ChefNet-yourself)
 * [Data Issues](#data-issues)
 * [Next Steps](#next-steps)
+* [Recipe Generation](#Recipe-Generation-with-recurrent-neural-networks)
 * [Thank yous](#thank-you)
 * [References](#references)
-
 
 
 ### Motivation
@@ -31,11 +31,11 @@ To create a labeled dataset of images of food, I scraped the recipes and user su
 
 ### Ingredient label wrangling
 
-<img src="figures/vocab_wordcloud.png" width="400">
+<img src="figures/vocab_wordcloud.png" width="600">
 
-In order to train a neural net, I needed to create consistent labels for ingredients. I took two approaches. My first approach was to start with the scraped list of ingredients, and identify the keyword using the indico keyword extraction api, while iteratively remove all words not critical to the underlying food item. My second approach, which I ultimately used to train my net, was to start with a cleaned list of ingredients initially scraped from enchantedlearning.com
+In order to train a neural net, I needed to create consistent labels for ingredients. I took two approaches. My first approach was to start with the scraped list of ingredients, and identify the keyword using the indico keyword extraction api, while iteratively remove all words not critical to the underlying food item (Code may be found in [Recipe Generation RNN](/Scrips/Recipe-Generation-RNN)). My second approach, which was ultimately used to train the [Ingredent Identifier](/Scripts/Ingredient_identifier), was to start with a cleaned list of ingredients initially scraped from enchantedlearning.com
 
-It is critical that image labels are as cleans as possible, otherwise the neural network will have difficulty learning. I think it is important to allow the model to have multi-word labels to represent items such as bell pepper. A useful extension of this project may be to vectorize the labels, so that the net will learn that the ingredient similarity, for example, misclassifying beef and steak is closer than chicken and peas. Vectorization methods require tokenization of text first. This may be an area worth explore further.
+It is critical that image labels are as cleans as possible, otherwise the neural network will have difficulty learning. It was also important to allow the model to have multi-word labels to represent items such as bell pepper. A useful extension of this project may be to vectorize the labels, so that the net will learn that the ingredient similarity, for example, misclassifying beef and steak is closer than chicken and peas. Vectorization methods require tokenization of text first. This may be an area worth explore further.
 
 ### Image Processing
 
@@ -43,9 +43,13 @@ Neural networks were trained with raw image data, and convolved imaged data that
 
 Images were downsized to 100x100 so that I could iterate through training multiple models, in the time allotted for capstone projects.
 
+Preprocessing scripts may be found in the [Preprocessing folder](/Scripts/Preprocessing)
+
 ### Neural Network Architecture
 
 My architecture went though multiple iterations, ultimately I settled on preprocessing images with VGG-16, and passing those activations into 3 hidden dense layers. My output layer consists of a sigmoid activation for each ingredient, and uses binary crossentropy loss.
+
+All neural network architectures may be found in [this code](/Scripts/Ingredient_identifier/build_models.py).
 
 ### Results
 
@@ -53,13 +57,13 @@ Overall the model had weighted Recall of 48% and Precision of 38%. These metrics
 
 Below you may see what classes had best Recall (top 10 ranged from 75%-100%), similar to the frequecy of words:
 
-<img src="figures/recall_wordcloud.png" width="400">
+<img src="figures/recall_wordcloud.png" width="600">
 
 Below represents the top classes in terms of Precision (top 10 range form 60%-100%), note that these classes are different. The generally only predicted these classes a few times in the validation set:
 
-<img src="figures/precision_wordcloud.png" width="400">
+<img src="figures/precision_wordcloud.png" width="600">
 
-Here are some examples of how it predicted
+Here are some examples of how it predicted:
 
 <img src="images/Carrot_cake_slide.png" width="">
 
@@ -107,6 +111,16 @@ There are a number of next steps that can be taken with this project.
 * Additional data may be scraped from other recipe websites to create a larger dataset.
 
 * Another extension may involve true image captioning at a character or word level. I started exploring this option, but found that is was less useful toward my motivation of predicting underlying ingredients.
+
+### Recipe Generation with Recurrent Neural Networks
+
+Separate from the ingredient identifier, I've also developed a model that will generate novel ingredients character by character, based on the cleaned recipes scraped from allrecipes.com. Here are a couple examples, I'm not sure how well they would turn out:
+
+* banana, lemon juice, cream mushroom soup, milk, cheese sauce
+
+* garlic, cheese, cheddar cheese, salt, cheese, sausage, garlic, pork, bacon hotme, chicken, sesame, asparagus, bread, cheese, bacon, hamburger bun
+
+My code for this maybe found in [Recipe Generation RNN](Scripts/Recipe_Generation_RNN)
 
 ### Thank you
 
