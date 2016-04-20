@@ -14,6 +14,7 @@ For example, what ingredients do you think are in this delicious looking cake?
     * [Image Processing](#image-processing)
     * [Neural Network Architecture](#neural-network-architecture)
 1. [Results](#results)
+    * [Overall Results](#overall-results)
     * [Example Predictions](#example-predictions)
     * [Data Issues](#data-issues)
 1. [Try ChefNet yourself](#try-chefnet-yourself)
@@ -53,7 +54,7 @@ All neural network architectures may be found in [this code](/Scripts/Ingredient
 
 # Results
 
-This section provides some high level results for how my final net performed, and then some examples of how it predicts on a particular image. 
+This section provides some high level results for how my final net performed, and then some examples of how it predicts on a particular image.
 
 ### Overall results ([Code](/Scripts/Ingredient_identifier/evaluate_models.py))
 
