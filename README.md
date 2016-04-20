@@ -73,7 +73,7 @@ Here are some examples of how well ChefNet Predicted:
 
 ##### My Lunch last Monday
 
-<img src="figures/Monday_Lunch_slide.png" width="">
+<img src="figures/Monday_lunch_slide.png" width="">
 
 ### Data Issues
 
