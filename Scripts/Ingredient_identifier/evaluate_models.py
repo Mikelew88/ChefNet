@@ -210,14 +210,15 @@ def random_simulation(y_true):
 
     return y_rand_cats
 
-
+# 0.37      0.41
 if __name__ == '__main__':
-    # df = pd.read_csv('/data/dfs/recipe_data.csv')
+    df = pd.read_csv('/data/dfs/recipe_data.csv')
     # Other model: MLP_full_batch
+    model, vocab = load_model_and_vocab('MLP_full_batch')
 
     # Other folder: /data/preprocessed_imgs/
     # (512,3,3)
-    # y_true, y_pred_cats, precision, recall, fbeta_score, support = validation_metrics(model, vocab, (512,3,3), '/data/vgg_imgs/', .25)
+    y_true, y_pred_cats, precision, recall, fbeta_score, support = validation_metrics(model, vocab, (3,100,100), '/data/preprocessed_imgs/', .25)
     #
     # y_rand_cats = random_simulation(y_true)
 

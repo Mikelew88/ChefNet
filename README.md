@@ -53,7 +53,9 @@ All neural network architectures may be found in [this code](/Scripts/Ingredient
 
 # Results
 
-Overall the model had weighted Recall of 48% and Precision of 38%. These metrics can be compared to a set of random predictions, with a similar number of true predictions as the model, and that had a Recall of 23% and Precision of 6%.
+Overall the model had weighted Recall of 48% and Precision of 38%. Without VGG-16 transfer learning Recall was 46% and Precision was 35%.
+
+These metrics can be compared to a set of random predictions, with a similar number of true predictions as the model, and that had a Recall of 23% and Precision of 6%.
 
 Below you may see what classes had best Recall (top 10 ranged from 75%-100%), similar to the frequecy of words:
 
