@@ -1,29 +1,24 @@
 # Welcome to ChefNet
 
-Here you may find my Galvanize Capstone Project.
-
-__Outline__
-
-* [Data](#data)
-* [Ingredient Labeling](#ingredient-label-wrangling)
-* [Image Processing](#image-processing)
-* [Neural Network Architecture](#neural-network-architecture)
-* [Results](#results)
-* [Data Issues](#data-issues)
-* [Try ChefNet yourself](#try-chefnet-yourself)
-* [Next Steps](#next-steps)
-* [Recipe Generation](#recipe-generation-with-recurrent-neural-networks)
-* [Thank you](#thank-you)
-* [References](#references)
-
-
-### Motivation
-
 What can we teach computer's about food? ChefNet is a convolutional neural network that identifies the ingredients in a dish by analyzing a picture of it.
 
-<img src="images/carrot_cake.jpg" width="400">
+<img src="images/carrot_cake.jpg" width="300">
 
+\
+__Outline__
 
+1. [Data](#data)
+    * [Ingredient Labeling](#ingredient-label-wrangling)
+    * [Image Processing](#image-processing)
+    * [Neural Network Architecture](#neural-network-architecture)
+1. [Results](#results)
+    * [Example Predictions](#example-predictions)
+    * [Data Issues](#data-issues)
+1. [Try ChefNet yourself](#try-chefnet-yourself)
+1. [Next Steps](#next-steps)
+1. [Recipe Generation](#recipe-generation-with-recurrent-neural-networks)
+1. [Thank you](#thank-you)
+    * [References](#references)
 
 # Data
 
@@ -39,8 +34,11 @@ It is critical that image labels are as cleans as possible, otherwise the neural
 
 ### Image Processing
 
-Neural networks were trained with raw image data, and convolved imaged data that was passed though the 2014 image net winner, VGG-16 from Oxford. Transfer learning proved more fruitful given the limited size of my dataset. Activations were taken at the end of layer 30, before flattening to dense layers. It would be interesting to compare results using activations taken after these dense layers, but I did not have time to explore this comparison.
+Neural networks were trained with raw image data, and convolved imaged data that was passed though the 2014 image net winner, VGG-16 from Oxford. Transfer learning proved more fruitful given the limited size of my dataset. Activations were taken at the end of layer 30, before flattening to dense layers. It would be interesting to compare results using activations taken after these dense layers, but I did not have time to explore this comparison. Here is a rough illustration of how the image vectorization process:
 
+<img src="Images/image_vectorization.png" width="">
+
+\
 Images were downsized to 100x100 so that I could iterate through training multiple models, in the time allotted for capstone projects.
 
 Preprocessing scripts may be found in the [Preprocessing folder](/Scripts/Preprocessing)
@@ -65,13 +63,15 @@ Below represents the top classes in terms of Precision (top 10 range form 60%-10
 
 <img src="figures/precision_wordcloud.png" width="600">
 
-Here are some examples of how it predicted:
+### Example Predictions
 
-### Carrot Cake
+Here are some examples of how well ChefNet Predicted:
+
+##### Carrot Cake
 
 <img src="images/Carrot_cake_slide.png" width="">
 
-### My Lunch last Monday
+##### My Lunch last Monday
 
 <img src="images/Monday_Lunch_slide.png" width="">
 
