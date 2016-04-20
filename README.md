@@ -9,11 +9,11 @@ __Outline__
 * [Image Processing](#image-processing)
 * [Neural Network Architecture](#neural-network-architecture)
 * [Results](#results)
-* [Try out ChefNet yourself](#Try-out-ChefNet-yourself)
 * [Data Issues](#data-issues)
+* [Try out ChefNet yourself](#Try-out-ChefNet-yourself)
 * [Next Steps](#next-steps)
 * [Recipe Generation](#Recipe-Generation-with-recurrent-neural-networks)
-* [Thank yous](#thank-you)
+* [Thank you](#thank-you)
 * [References](#references)
 
 
@@ -65,11 +65,21 @@ Below represents the top classes in terms of Precision (top 10 range form 60%-10
 
 Here are some examples of how it predicted:
 
+### Carrot Cake
+
 <img src="images/Carrot_cake_slide.png" width="">
 
-<img src="images/Monday_Lunch_slide.png" width="">
+### My Lunch last Monday
 
-### Try out ChefNet yourself
+<img src="images/Monday_lunch_slide.png" width="">
+
+### Data Issues
+
+The data is not perfect, below is a slide that shows two different images for the same recipe. Not only can the sugar cookie look completely different based on the decoration decisions, but there are also misplaced pictures:
+
+<img src="images/User_imgs.png" width="">
+
+# Try out ChefNet yourself
 
 First you will need to install these dependencies, in addition to Conda:
 
@@ -95,12 +105,6 @@ If you run the script in ipython, you may just run `predict_user_photo(model, vo
 
 Here is an example of how it should look:
 <img src="images/demo.png" width="">
-
-### Data Issues
-
-The data is not perfect, below is a slide that shows two different images for the same recipe. Not only can the sugar cookie look completely different based on the decoration decisions, but there are also misplaced pictures:
-
-<img src="images/User_imgs.png" width="">
 
 # Next Steps
 
