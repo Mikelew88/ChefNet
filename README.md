@@ -25,7 +25,7 @@ What can we teach computer's about food? ChefNet is a convolutional neural netwo
 
 
 
-### Data
+# Data
 
 To create a labeled dataset of images of food, I scraped the recipes and user submitted photos of 17,000 recipes, totaling 230,000 user photos, from allrecipes.com. The scraper was run on an AWS instance and took about a day to run, massive speedups may be attributed to parallelizing and threading the scraping process. Code is in the [Web Scrapers](/Scripts/Web_scrapers) folder under Scripts.
 
@@ -51,7 +51,7 @@ My architecture went though multiple iterations, ultimately I settled on preproc
 
 All neural network architectures may be found in [this code](/Scripts/Ingredient_identifier/build_models.py).
 
-### Results
+# Results
 
 Overall the model had weighted Recall of 48% and Precision of 38%. These metrics can be compared to a set of random predictions, with a similar number of true predictions as the model, and that had a Recall of 23% and Precision of 6%.
 
@@ -102,7 +102,7 @@ The data is not perfect, below is a slide that shows two different images for th
 
 <img src="images/User_imgs.png" width="">
 
-### Next Steps
+# Next Steps
 
 There are a number of next steps that can be taken with this project.
 
@@ -122,7 +122,7 @@ Separate from the ingredient identifier, I've also developed a model that will g
 
 My code for this maybe found in [Recipe Generation RNN](Scripts/Recipe_Generation_RNN)
 
-### Thank you
+# Thank you
 
 Big thank you to Jesse Lieman-Sifry for the inspiration behind this project, as well as to my Galvanize Instructors and peers for the continuous help and suggestions along the way. It was a pleasure to work with all of you.
 
