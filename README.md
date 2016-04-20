@@ -4,7 +4,8 @@ What can we teach computer's about food? ChefNet is a convolutional neural netwo
 
 <img src="images/carrot_cake.jpg" width="300">
 
-\
+<br><br>
+
 __Outline__
 
 1. [Data](#data)
@@ -38,7 +39,8 @@ Neural networks were trained with raw image data, and convolved imaged data that
 
 <img src="figures/image_vectorization.png" width="">
 
-\
+<br><br>
+
 Images were downsized to 100x100 so that I could iterate through training multiple models, in the time allotted for capstone projects.
 
 Preprocessing scripts may be found in the [Preprocessing folder](/Scripts/Preprocessing)
@@ -73,7 +75,7 @@ Here are some examples of how well ChefNet Predicted:
 
 ##### My Lunch last Monday
 
-<img src="images/Monday_Lunch_slide.png" width="">
+<img src="figures/Monday_Lunch_slide.png" width="">
 
 ### Data Issues
 
