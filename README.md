@@ -51,7 +51,11 @@ My architecture went though multiple iterations, ultimately I settled on preproc
 
 All neural network architectures may be found in [this code](/Scripts/Ingredient_identifier/build_models.py).
 
-# Results ([Code](/Scripts/Ingredient_identifier/evaluate_models.py))
+# Results
+
+This section provides some high level results for how my final net performed, and then some examples of how it predicts on a particular image. 
+
+### Overall results ([Code](/Scripts/Ingredient_identifier/evaluate_models.py))
 
 __ChefNet:__ 48% Recall, 38% Precision
 
@@ -59,11 +63,12 @@ __ChefNet without VGG-16 Processiong:__ 46% Recall, 35% Precision
 
 __Random simulation with simulated classes:__ 23% Recall, 6% Precision
 
-Below you may see what classes had best Recall (top 10 ranged from 75%-100%), similar to the frequency of words:
+The algorithm was able to perform better for some ingredients tahn other. Below you may see what classes had best Recall (top 10 ranged from 75%-100%). The net had better recall for those ingredients that were more frequent in the dataset:
 
 <img src="figures/recall_wordcloud.png" width="400">
 
-Below represents the top classes in terms of Precision (top 10 range form 60%-100%), note that these classes are different. The generally only predicted these classes a few times in the validation set:
+Below represents the top classes in terms of Precision (top 10 range form 60%-100%), note that these classes are different. In gen
+eraly, the net was more precise with ingredients it only predicted a few times:
 
 <img src="figures/precision_wordcloud.png" width="400">
 
