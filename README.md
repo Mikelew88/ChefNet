@@ -71,7 +71,7 @@ Here are some examples of how it predicted:
 
 ### My Lunch last Monday
 
-<img src="images/Monday_lunch_slide.png" width="">
+<img src="images/Monday_Lunch_slide.png" width="">
 
 ### Data Issues
 
