@@ -10,9 +10,9 @@ __Outline__
 * [Neural Network Architecture](#neural-network-architecture)
 * [Results](#results)
 * [Data Issues](#data-issues)
-* [Try out ChefNet yourself](#Try-out-ChefNet-yourself)
+* [Try out ChefNet yourself](#try-chefnet-yourself)
 * [Next Steps](#next-steps)
-* [Recipe Generation](#Recipe-Generation-with-recurrent-neural-networks)
+* [Recipe Generation](#recipe-generation-with-recurrent-neural-networks)
 * [Thank you](#thank-you)
 * [References](#references)
 
@@ -81,7 +81,7 @@ As an example, below you may see two user submitted images for the same sugar co
 
 <img src="images/User_imgs.png" width="">
 
-# Try out ChefNet yourself
+# Try ChefNet yourself
 
 First you will need to install these dependencies, in addition to Conda:
 
