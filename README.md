@@ -2,10 +2,12 @@
 
 What can we teach computer's about food? ChefNet is a convolutional neural network that identifies the ingredients in a dish by analyzing a picture of it.
 
+For example, what ingredients do you think are in this delicious looking cake?
+
 <img src="images/carrot_cake.jpg" width="300">
 <br><br>
 
-__Outline__
+# Table of Contents
 
 1. [Data](#data)
     * [Ingredient Labeling](#ingredient-label-wrangling)
@@ -26,7 +28,7 @@ To create a labeled dataset of images of food, I scraped the recipes and user su
 
 ### Ingredient label wrangling
 
-<img src="figures/vocab_wordcloud.png" width="600">
+<img src="figures/vocab_wordcloud.png" width="400">
 
 In order to train a neural net, I needed to create consistent labels for ingredients. I took two approaches. My first approach was to start with the scraped list of ingredients, and identify the keyword using the indico keyword extraction api, while iteratively remove all words not critical to the underlying food item (Code may be found in [Recipe Generation RNN](/Scrips/Recipe-Generation-RNN)). My second approach, which was ultimately used to train the [Ingredent Identifier](/Scripts/Ingredient_identifier), was to start with a cleaned list of ingredients initially scraped from enchantedlearning.com
 
@@ -59,11 +61,11 @@ __Random simulation with simulated classes:__ 23% Recall, 6% Precision
 
 Below you may see what classes had best Recall (top 10 ranged from 75%-100%), similar to the frequency of words:
 
-<img src="figures/recall_wordcloud.png" width="600">
+<img src="figures/recall_wordcloud.png" width="400">
 
 Below represents the top classes in terms of Precision (top 10 range form 60%-100%), note that these classes are different. The generally only predicted these classes a few times in the validation set:
 
-<img src="figures/precision_wordcloud.png" width="600">
+<img src="figures/precision_wordcloud.png" width="400">
 
 ### Example Predictions
 
