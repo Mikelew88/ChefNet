@@ -75,7 +75,9 @@ Here are some examples of how it predicted:
 
 ### Data Issues
 
-The data is not perfect, below is a slide that shows two different images for the same recipe. Not only can the sugar cookie look completely different based on the decoration decisions, but there are also misplaced pictures:
+The data is not perfect, below is a slide that shows two different images for the same recipe. Not only can the sugar cookie look completely different based on the decoration decisions, but there are also misplaced pictures.
+
+As an example, below you may see two user submitted images for the same sugar cookie recipe. The first illustrates how a cooking may look like just about anything, the second shows how users misplace images:
 
 <img src="images/User_imgs.png" width="">
 
