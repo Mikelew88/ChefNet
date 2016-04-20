@@ -36,7 +36,7 @@ It is critical that image labels are as cleans as possible, otherwise the neural
 
 Neural networks were trained with raw image data, and convolved imaged data that was passed though the 2014 image net winner, VGG-16 from Oxford. Transfer learning proved more fruitful given the limited size of my dataset. Activations were taken at the end of layer 30, before flattening to dense layers. It would be interesting to compare results using activations taken after these dense layers, but I did not have time to explore this comparison. Here is a rough illustration of how the image vectorization process:
 
-<img src="Images/image_vectorization.png" width="">
+<img src="figures/image_vectorization.png" width="">
 
 \
 Images were downsized to 100x100 so that I could iterate through training multiple models, in the time allotted for capstone projects.
@@ -69,7 +69,7 @@ Here are some examples of how well ChefNet Predicted:
 
 ##### Carrot Cake
 
-<img src="images/Carrot_cake_slide.png" width="">
+<img src="figures/Carrot_cake_slide.png" width="">
 
 ##### My Lunch last Monday
 
@@ -81,7 +81,7 @@ The data is not perfect, below is a slide that shows two different images for th
 
 As an example, below you may see two user submitted images for the same sugar cookie recipe. The first illustrates how a cooking may look like just about anything, the second shows how users misplace images:
 
-<img src="images/User_imgs.png" width="">
+<img src="figures/User_imgs.png" width="">
 
 # Try ChefNet yourself
 
@@ -109,7 +109,7 @@ If you run the script in ipython, you may just run `predict_user_photo(model, vo
 
 Here is an example of how it should look:
 
-<img src="images/demo.png" width="">
+<img src="figures/demo.png" width="">
 
 # Next Steps
 
