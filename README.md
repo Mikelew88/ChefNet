@@ -10,7 +10,7 @@ __Outline__
 * [Neural Network Architecture](#neural-network-architecture)
 * [Results](#results)
 * [Data Issues](#data-issues)
-* [Try out ChefNet yourself](#try-chefnet-yourself)
+* [Try ChefNet yourself](#try-chefnet-yourself)
 * [Next Steps](#next-steps)
 * [Recipe Generation](#recipe-generation-with-recurrent-neural-networks)
 * [Thank you](#thank-you)
@@ -101,11 +101,12 @@ VGG-16 weights: [vgg16_weights.h5](https://drive.google.com/file/d/0Bz7KyqmuGsil
 
 Next you should move any image file you would like to predict on into the [images](/images) folder.
 
-Now you can run [predict_ingredients.py](/Scripts/Ingredient_identifier) to have the model make your predictions (make sure you run from the [ingredient identifier](/Scripts/Ingredient_identifier)).
+Now you can run [predict_ingredients.py](/Scripts/Ingredient_identifier) to have the model make your predictions (make sure you navigate to the [ingredient identifier](/Scripts/Ingredient_identifier) before running ipython).
 
 If you run the script in ipython, you may just run `predict_user_photo(model, vocab)` to predict additional photos without reloading the model.
 
 Here is an example of how it should look:
+
 <img src="images/demo.png" width="">
 
 # Next Steps
