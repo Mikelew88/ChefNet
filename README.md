@@ -44,7 +44,7 @@ Neural networks were trained with raw image data, and convolved imaged data that
 
 Images were downsized to 100x100 so that I could iterate through training multiple models, in the time allotted for capstone projects.
 
-### Neural Network Architecture ([Code](/Scripts/Preprocessing))
+### Neural Network Architecture ([Code](/Scripts/Ingredient_identifier/build_models.py))
 
 My architecture went though multiple iterations, ultimately I settled on preprocessing images with VGG-16, and passing those activations into 3 hidden dense layers. My output layer consists of a sigmoid activation for each ingredient, and uses binary crossentropy loss.
 
