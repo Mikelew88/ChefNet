@@ -58,7 +58,7 @@ __ChefNet:__ 48% Recall, 38% Precision
 
 __ChefNet without VGG-16 Processing:__ 46% Recall, 35% Precision
 
-__Naive simulation:__ 23% Recall, 6% Precision
+__Naive simulation:__ 6% Recall, 21% Precision
 
 The algorithm was able to perform better for some ingredients than other. Below you may see what classes had best Recall (top 10 ranged from 75%-100%). The net had better recall for those ingredients that were more frequent in the dataset:
 

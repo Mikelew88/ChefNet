@@ -207,7 +207,7 @@ def random_simulation(y_true):
 
     print classification_report(y_true,y_rand_cats, target_names=list(vocab))
 
-
+    import pdb; pdb.set_trace()
     return y_rand_cats
 
 # 0.37      0.41
@@ -220,7 +220,7 @@ if __name__ == '__main__':
     # (3,100,100)
     y_true, y_pred_cats, precision, recall, fbeta_score, support = validation_metrics(model, vocab, (512,3,3), '/data/vgg_imgs/', .25)
     #
-    # y_rand_cats = random_simulation(y_true)
+    y_rand_cats = random_simulation(y_true)
 
     # generate_wordcloud(vocab,recall, 'recall_wordcloud.png')
     # random_guessing = calculate_random_guessing(y, vocab)
