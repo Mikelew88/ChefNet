@@ -25,7 +25,7 @@ For example, what ingredients do you think are in this delicious looking cake?
 
 # Data
 
-To create a labeled dataset of images of food, I scraped the recipes and user submitted photos of 17,000 recipes, totaling 230,000 user photos, from allrecipes.com. The scraper was run on an AWS instance and took about a day to run, massive speedups may be attributed to parallelizing and threading the scraping process. Code is in the [Web Scrapers](/Scripts/Web_scrapers) folder under Scripts.
+To create a labeled dataset of images of food, I scraped the recipes and user submitted photos of 17,000 recipes, totaling 230,000 user photos, from allrecipes.com. The scraper was run on an AWS instance and took about a day to run. Massive speedups may be attributed to parallelizing and threading the scraping process. Code is in the [Web Scrapers](/Scripts/Web_scrapers) folder under Scripts.
 
 ### Ingredient label wrangling
 
@@ -33,7 +33,7 @@ To create a labeled dataset of images of food, I scraped the recipes and user su
 
 In order to train a neural net, I needed to create consistent labels for ingredients. I took two approaches. My first approach was to start with the scraped list of ingredients, and identify the keyword using the indico keyword extraction api, while iteratively remove all words not critical to the underlying food item (Code may be found in [Recipe Generation RNN](/Scrips/Recipe-Generation-RNN)). My second approach, which was ultimately used to train the [Ingredent Identifier](/Scripts/Ingredient_identifier), was to start with a cleaned list of ingredients initially scraped from enchantedlearning.com
 
-It is critical that image labels are as cleans as possible, otherwise the neural network will have difficulty learning. It was also important to allow the model to have multi-word labels to represent items such as bell pepper. A useful extension of this project may be to vectorize the labels, so that the net will learn that the ingredient similarity, for example, misclassifying beef and steak is closer than chicken and peas. Vectorization methods require tokenization of text first. This may be an area worth explore further.
+It is critical that image labels are as clean as possible, otherwise the neural network will have difficulty learning. It was also important to allow the model to have multi-word labels to represent items such as bell pepper. A useful extension of this project may be to vectorize the labels, so that the net will learn that the ingredient similarity, for example, misclassifying beef and steak is closer than chicken and peas. Vectorization methods require tokenization of text first. This may be an area worth explore further.
 
 ### Image Processing ([Code](/Scripts/Preprocessing))
 
@@ -60,18 +60,17 @@ __ChefNet without VGG-16 Processing:__ 46% Recall, 35% Precision
 
 __Naive simulation:__ 6% Recall, 21% Precision
 
-The algorithm was able to perform better for some ingredients than other. Below you may see what classes had best Recall (top 10 ranged from 75%-100%). The net had better recall for those ingredients that were more frequent in the dataset:
+The algorithm was able to perform better for some ingredients than other. Below you may see what classes had best recall (top 10 ranged from 75%-100%). The net had better recall for those ingredients that were more frequent in the dataset:
 
 <img src="figures/recall_wordcloud.png" width="400">
 
-Below represents the top classes in terms of Precision (top 10 range form 60%-100%), note that these classes are different. In gen
-eraly, the net was more precise with ingredients it only predicted a few times:
+Below represents the top classes in terms of Precision (top 10 range form 60%-100%), note that these classes are different. In general, the net was more precise with ingredients it only predicted a few times:
 
 <img src="figures/precision_wordcloud.png" width="400">
 
 ### Example Predictions
 
-Here are some examples of how well ChefNet Predicted:
+Here are some examples of how well ChefNet predicted:
 
 ##### Carrot Cake
 
