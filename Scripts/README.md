@@ -2,12 +2,12 @@
 
 Here you will find Python code to:
 
-* [scrape together the dataset](/Web_scrapers)
+* [scrape together the dataset](/Scripts/Web_scrapers)
 
-* [preprocess text and images](/Preprocessing)
+* [preprocess text and images](/Scripts/Preprocessing)
 
-* [train and use models](/Ingredient_identifier)
+* [train and use models](/Scripts/Ingredient_identifier)
 
-* [generate recipes with an RNN](/Recipe_Generation_RNN)
+* [generate recipes with an RNN](/Scripts/Recipe_Generation_RNN)
 
 Enjoy!
